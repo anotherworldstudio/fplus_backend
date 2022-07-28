@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lagn="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layout/default">
+
+<th:block layout:fragment="content">	
+
+<!-- Javascript functions	-->
+<script type="text/javascript">
+    
+	document.addEventListener("DOMContentLoaded", function(){
+		setActiveChecked('activeChk', 'active');
+    	$("#category1").val(lesson.category1);
+    	changeCategory2($('#category1').val());
+    	$("#category2").val(lesson.category2);
+    	
+    	drawLessonFaceList();
+    	
+	});    
+
+	
+</script>
+
+
+<script th:inline="javascript">
+
+var resourceList = null;
+var content = null;
+
+/*<![CDATA[*/
+    resourceList = /*[[${lessonView.resourceList}]]*/ [];
+    //console.log(resourceList);
+/*]]>*/
+
+/*<![CDATA[*/
+   	lesson = /*[[${lessonView.lesson}]]*/ "";
+    //console.log(content);
+/*]]>*/
+	
+	/*<![CDATA[*/
+    baseLessonFaceList = /*[[${lessonView.lessonFaceList}]]*/ "";    
+/*]]>*/
+
+ 	var check = true;
+ 	
+	window.onbeforeunload = function() {
+		setActive('activeChk', 'active');
+		
+		if(lesson.category1!=$("#category1 option:selected").val()){
+				console.log('대구분'+lesson.category1 + ' = '+$("#category1 option:selected").val()  )
+		}else if(lesson.active != $('#active').val()){
+				console.log(lesson.active != $('#active').val());
+				console.log('활성화'+lesson.active + ' = '+$('#active').val()  )
+		}else if(lesson.category2 != $("#category2 option:selected").val()){
+				console.log('소구분'+lesson.category2 + ' = '+$("#category2 option:selected").val()  )
+		}else if(lesson.title != $('#title').val()){
+				console.log('제목'+lesson.active + ' = '+$('#title').val()  )
+		}else if(lesson.orders != $('#orders').val()){
+				console.log('순서'+lesson.orders + ' = '+$('#orders').val()  )
+		}else if(lesson.content !=$('#content').val()){
+				console.log('내용'+lesson.content + ' = '+$('#content').val()  )
+		}else if(lesson.startDate != $('#startDate').val()){
+				console.log('시작일자'+lesson.startDate + ' = '+$('#startDate').val()  )
+		}else if(lesson.endDate  !=$('#endDate').val()){
+				console.log('끝날짜'+lesson.endDate + ' = '+$('#endDate').val()  )
+		}else if(lesson.viewType !=$('#viewType').val()){
+				console.log('뷰타입'+lesson.viewType + ' = '+$('#viewType').val()  )
+	//	}else if(lesson.mainLink !=$('#mainLink').val()){
+	//			console.log('링크'+lesson.mainLink + ' = '+$('#mainLink').val()  )
+		}else if(lesson.status !=$('#status').val()){
+				console.log('상태'+lesson.status + ' = '+$('#status').val()  )
+		}else{
+			check =false;
+		}
+	
+	 	if(check){
+	    	return "나가실래요?";
+	 	}
+	}
+ 
+</script>
+
+
+
+
+<script>
+
+function drawLessonFaceList(peerLessonFaceList){
+	if(peerLessonFaceList == null){
+		peerLessonFaceList = baseLessonFaceList;
+	}else{
+		baseLessonFaceList = peerLessonFaceList;
+	}
+	
+	var divSrc1 = ""
+	var divSrc2 = ""
+	var divSrc3 = ""
+	var divSrc4 = ""
+	var divSrc5 = ""
+	var divSrc6 = ""
+	peerLessonFaceList.map( (item, idx) => {
+		if (item.type == "0000"){
+			divSrc1 = divSrc1 + getLessonFaceDivlet(item);
+		}else if ( item.type == "1000"){
+			divSrc2 = divSrc2 + getLessonFaceDivlet(item);
+		}else if ( item.type == "2000"){
+			divSrc3 = divSrc3 + getLessonFaceDivlet(item);
+		}else if ( item.type == "3000"){
+			divSrc4 = divSrc4 + getLessonFaceDivlet(item);
+		}else if ( item.type == "4000"){
+			divSrc5 = divSrc5 + getLessonFaceDivlet(item);
+		}else if ( item.type == "5000"){
+			divSrc6 = divSrc6 + getLessonFaceDivlet(item);
+		}
+			//	divSrc = divSrc + getPeerProductDivlet(item.title, item.contentId, item.mainUrl,item.priority);
+		// divSrc = divSrc + getPeerProductDivlet(item.type, item.category, item.typeName, item.categoryName, item.lessonId);
+	}); 
+	$('#lessonFaceAgeDiv').empty();
+	$('#lessonFaceAgeDiv').append(divSrc1);	
+	$('#lessonFaceFaceDiv').empty();
+	$('#lessonFaceFaceDiv').append(divSrc2);
+	$('#lessonFaceSeasonColorDiv').empty();
+	$('#lessonFaceSeasonColorDiv').append(divSrc3);
+	$('#lessonFaceSkinToneDiv').empty();
+	$('#lessonFaceSkinToneDiv').append(divSrc4);	
+	$('#lessonFaceGenderDiv').empty();
+	$('#lessonFaceGenderDiv').append(divSrc5);	
+	$('#lessonFaceTypeDiv').empty();
+	$('#lessonFaceTypeDiv').append(divSrc6);
+		
+}
+
+function getLessonFaceDivlet2(item){
+	var divSrc = ""
+	divSrc = divSrc + "<div class='col-md-55' style ='width:100px' id='" + item.lessonFaceId + "')>                                                                               ";  
+	divSrc = divSrc + "	<div class='thumbnail' style='height:100px; width:100px'>						                                 ";
+	divSrc = divSrc + "	  <div class='image view view-first' style='height:100px; '>					                         ";   		
+	divSrc = divSrc + "		<img style='width: 100px; height:100px; display: block;' src='/images/lessonFace/"+item.type+"_"+item.category + ".png'	onerror='/images/add_img.png' />					 ";                           
+	divSrc = divSrc + "		<div class='mask'>                                                                               ";
+	divSrc = divSrc + "		  <p><h4 style='color:white;' >" + item.categoryName + "</h4></p>                                                                                  ";
+	divSrc = divSrc + "		  <div class='tools tools-bottom'>    ";
+	divSrc = divSrc + "			<a href='#' onClick=deletePeerProduct('" + item.lessonFaceId + "')><i class='fa fa-times'></i></a>      ";
+	divSrc = divSrc + "		  </div>                                                                                         ";
+	divSrc = divSrc + "		</div>		                                                                                     ";
+	divSrc = divSrc + "	  </div>					                            					                         "; 					                          
+	divSrc = divSrc + "	</div>                                                                                               ";
+	divSrc = divSrc + "</div>                                                                                                ";
+			
+	return divSrc;
+}
+
+
+function getLessonFaceDivlet(item){
+	var divSrc = ""
+	divSrc = divSrc + "<div class='col-md-55' style ='width:200px' id='" + item.lessonFaceId  + "')>                                                                               ";  
+	divSrc = divSrc + "	<div class='thumbnail' style='height:200px;'>						                                 ";
+	divSrc = divSrc + "	  <div class='image view view-first' style='height:200px; '>					                         ";   		
+	divSrc = divSrc + "			<img style='width: 150px; height:150px; display: block;' src='/images/lessonFace/"+item.type+"_"+item.category + ".png'	onerror='/images/add_img.png'  />					 ";                           
+	divSrc = divSrc + "		<div class='mask'>                                                                               ";
+	divSrc = divSrc + "		  	<p><h4 style='color:white;' >" +item.categoryName + "</h4></p>                                                                                  ";
+	divSrc = divSrc + "		  	<div class='tools tools-bottom'>                                                               ";
+	divSrc = divSrc + "				<a href='#' onClick=deleteLessonFace('" + item.lessonFaceId + "')><i class='fa fa-times'></i></a>      ";
+	divSrc = divSrc + "		  </div>                                                                                         ";
+	divSrc = divSrc + "		</div>		                                                                                     ";
+	divSrc = divSrc + "	  </div>					                            					                         "; 					                          
+	divSrc = divSrc + "	</div>                                                                                               ";
+	divSrc = divSrc + "</div>                                                                                                ";
+			
+	return divSrc;
+}
+
+
+
+
+function deleteLessonFace(lessonFaceId){
+
+    var lessonId = $("#lessonId").val();
+    
+    var formData = new FormData();
+    formData.append("lessonId", lessonId);
+    formData.append("lessonFaceId", lessonFaceId);
+     
+    var url = "/w1/lesson/delete_lesson_face";
+    
+	$.ajax({
+        url : url,
+        data: formData,  
+		processData: false, 
+		contentType: false, 
+		cache: false,
+        type : 'post',
+        success : function(result){
+        	drawLessonFaceList(result.lessonFaceList);
+        },
+        error : function(e){
+        	console.log(e);
+        }
+    });
+}
+
+function getResource(seq){
+	
+	var resource = resourceList.find((n) => (
+		n.seq == seq
+	));	
+	
+	console.log(resource);	
+	return resource;
+}
+
+function saveContent(){
+	//var activeChk = $("#activeChk").attr('checked') ? 'Y' : 'N';*
+	//$("#active").val(activeChk);		
+	
+	setActive('activeChk', 'active');
+	setYn('replyYnChk', 'replyYn');
+	
+	form1.submit();
+}
+
+function editLesson(){	
+
+	setActive('activeChk', 'active');
+	
+	showModal("수정 하시겠습니까?", true, function(){
+		check = false;
+		form1.action = "/w1/lesson/save_lesson";
+		form1.submit();
+	});
+		
+}
+
+function deleteLesson(){
+	showModal("삭제 하시겠습니까?", true, function(){
+		check = false;
+		form1.action = "/w1/lesson/delete_lesson";
+		form1.submit();
+	});
+}
+
+function goList(){
+	location.href="/w1/lesson/go_list";		
+}
+
+function deleteResource(lessonId, resourceId){	
+	showModal("삭제 하시겠습니까?", true, function(){
+		
+		$('#lessonId').val(lessonId);
+		$('#deleteResourceId').val(resourceId);
+		
+		location.href = "/w1/resource/delete?contentId="+$('#lessonId').val()+"&deleteResourceId="+$('#deleteResourceId').val()+"&pageName=lesson"
+	
+	});
+}
+
+function clearResourceM(){
+	$("#resourceTypeM").val("").prop("selected", false);
+	$("#resourceCategoryM").val("9999").prop("selected", false);
+	$("#resourceTitleM").val("");
+	$("#resourceContentM").val("");	
+	$("#urlM").val("");		
+	$("#resourceSeqM").val("");
+	$("#contentIdM").val("");
+	$("#resourceIdM").val("");	
+}
+
+function addResource(){
+	clearResourceM();
+	$("#resourceSeqSpan").html(" 신규 등록");
+	
+	var lessonId = $("#lessonId").val();
+	$("#contentIdM").val(lessonId);
+	changeLessonFaceCategory();
+	$('#resourceForm').modal("show");	
+}
+
+	
+function clearLessonFaceM(){
+	$("#lessonFaceTypeM").val("5000").prop("selected", false);
+	changeLessonFaceCategory();
+	$("#lessonFaceCategoryM").val("0000").prop("selected", false);
+}
+
+function addLessonFace(){
+	clearResourceM();
+	$("#lessonFaceSeqSpan").html(" 신규 등록");
+	
+	var lessonId = $("#lessonId").val();
+	$("#lessonIdM").val(lessonId);
+	
+	$('#lessonFaceForm').modal("show");	
+}
+
+function editResource(seq){ 
+	clearResourceM();
+	
+	var resource = getResource(seq);
+	if(resource == null){
+		alert("순번이 잘못되었습니다.");
+		return;
+	}
+	
+	var contentId = resource.contentId;
+	var resourceId = resource.resourceId;
+	var resourceType = resource.resourceType;
+	var resourceCategory = resource.resourceCategory;
+	var resourceTitle = resource.resourceTitle;
+	var resourceContent = resource.resourceContent;
+	var resourceOrder = resource.orders; 
+	var url = resource.url;
+	var link = resource.link;
+	
+	console.log(
+		seq + " : " + contentId + " : " +  resourceId + " : " +  resourceType + " : " +  resourceContent + " : " +  url + " : " + resourceTitle
+	);
+	
+	
+	$("#resourceSeqSpan").html(seq);
+	
+	$("#resourceTypeM").val(resourceType).prop("selected", true); 
+	$("#resourceCategoryM").val(resourceCategory).prop("selected", true);
+	$("#resourceTitleM").val(resourceTitle);
+	$("#resourceContentM").val(resourceContent);
+	
+	if(resourceType == "1020"){
+		$("#urlM").val(url);	
+	}else{
+		$("#urlM").val(link);
+	}
+	
+	$("#resourceSeqM").val(seq);
+	$("#contentIdM").val(contentId);
+	$("#resourceIdM").val(resourceId);	
+	$("#resourceOrderM").val(resourceOrder);
+	
+	$('#resourceForm').modal("show");	
+}
+function hideResource(){
+	$("#resourceOrderM").val(0);
+	$('#resourceForm').modal("hide");	
+	clearResourceM();
+}
+function hideLessonFace(){
+	$('#lessonFaceForm').modal("hide");	
+	clearLessonFaceM();
+}     
+function saveResource(){
+	showConfirm("저장 하시겠습니까?", function(){
+		var data = new FormData();
+		data.append("fileName", $('#fileNameM').prop('files')[0]);	
+		var seq = $("#resourceSeqM").val();
+		if(seq != null && seq != ""){			
+			data.append("seq", $("#resourceSeqM").val());
+		}
+		
+		data.append("contentId", $("#contentIdM").val());
+		data.append("resourceId", $("#resourceIdM").val());
+		data.append("resourceType", $("#resourceTypeM").val());
+		data.append("resourceCategory", $("#resourceCategoryM").val());
+		data.append("resourceTitle", $("#resourceTitleM").val());
+		data.append("resourceContent", $("#resourceContentM").val());
+		data.append("orders", $("#resourceOrderM").val());
+		data.append("url", $("#urlM").val());  
+		
+		for (var pair of data.entries()) { 
+			console.log(pair[0]+ ', ' + pair[1]); 
+		}
+
+		$.ajax({
+            type: "POST",
+            enctype: 'multipart/form-data',
+            url: "/w1/resource/save",
+            data: data,
+            processData: false,
+            contentType: false,
+            cache: false,
+            timeout: 180000,
+            success: function (result) {
+                console.log("SUCCESS : ", result.code);
+                if(result.code == "0000"){
+                	//화면 갱신 
+                    location.reload();	
+                }  
+            },
+            error: function (e) {
+                console.log("ERROR : ", e);
+                alert("처리 중 오류가 발생하였습니다.");
+            }
+        });
+	});
+
+}
+     
+function saveLessonFace(){
+	showConfirm("저장 하시겠습니까?", function(){
+		var data = new FormData();
+		var seq = $("#lessonFaceSeqM").val();
+		
+		if(seq != null && seq != ""){			
+			data.append("seq", $("#lessonFaceSeqM").val());
+		}
+		
+		data.append("lessonId", $("#lessonIdM").val());
+		data.append("type", $("#lessonFaceTypeM").val());
+		data.append("category", $("#lessonFaceCategoryM").val());
+		
+		for (var pair of data.entries()) { 
+			console.log(pair[0]+ ', ' + pair[1]); 
+		}
+
+		$.ajax({
+            type: "POST",
+            enctype: 'multipart/form-data',
+            url: "/w1/lesson/save_lessonFace",
+            data: data,
+            processData: false,
+            contentType: false,
+            cache: false,
+            timeout: 180000,
+            success: function (result) {
+                console.log("SUCCESS : ", result.code);
+				if(result.code == "8070"){
+                	alert("이미 해당된 카테고리입니다");	
+                }  
+                if(result.code == "0000"){
+                	//화면 갱신 
+                    location.reload();	
+                }               
+            },
+            error: function (e) {
+                console.log("ERROR : ", e);
+                alert("처리 중 오류가 발생하였습니다.");
+            }
+        });
+	});
+
+}
+
+
+
+function saveReply(){
+	showConfirm("저장 하시겠습니까?", function(){
+		var data = new FormData();
+		
+		data.append("content", $("#replyContent").val());
+		data.append("upperContentId", $("#contentId").val());
+		
+		saveReplyCommon(data);
+
+// 		$.ajax({
+//             type: "POST",
+//             enctype: 'multipart/form-data',
+//             url: "/w1/content/save_reply",
+//             data: data,
+//             processData: false,
+//             contentType: false,
+//             cache: false,
+//             timeout: 180000,
+//             success: function (result) {
+//                 console.log("SUCCESS : ", result.code);
+//                 if(result.code == "0000"){
+//                 	$("#replyContent").val("");
+//                 	search();                	
+
+//                 }               
+//             },
+//             error: function (e) {
+//                 console.log("ERROR : ", e);
+//                 alert("처리 중 오류가 발생하였습니다.");
+//             }
+//         });
+	});
+}
+
+function changeCategory2(type){
+	var row;
+	if(type=='1000'){
+		$('#category2div').show();
+	}else{
+		$('#category2div').hide();
+	}
+}
+
+
+function changeLessonFaceCategory(){
+	var selectCategory1 = $('#lessonFaceTypeM option:selected').val();
+	
+	var param = {};
+	param.type = selectCategory1;
+	param = JSON.stringify(param);
+		
+	$('#lessonFaceCategoryM').empty();
+	    
+		$.ajax({
+	        url : "/w1/lesson/set_lesson_face_category",
+	        data : param,
+	        type : 'post',
+	        contentType:"application/json; charset=UTF-8",
+	        dataType:"json",
+	        success : function(data){
+	            var lfresults = data;
+	            var lfrows = "";
+	            $.each(lfresults, function(index, item) {
+	            	lfrows = lfrows + getOptionLine(item);
+				});	            
+	            $('#lessonFaceCategoryM').append(lfrows);
+	            
+	            
+	        },
+	        error : function(e){
+	        	console.log(e);
+	        }
+	    });
+	
+}
+
+function getOptionLine(lessonFace){
+	var lfrow = "\n";
+	lfrow = "<option value="+lessonFace.category+">"+lessonFace.categoryName+"</option>";	
+	
+	return lfrow;
+}
+
+function getRow(content, count){
+	var row = "\n";
+	row = row + "<tr class='even pointer'>                                     ";
+    row = row + "  <td class=''>"+ content.seq + "</td>         ";
+    row = row + "  <td class='' style='vertical-align: middle;'><img src='" + content.ownerImgUrl + "' class='img-responsive img-rounded' style='width:70px;height:75px;'></td>";
+    row = row + "  <td class=''>"+ content.ownerName + "</td>";
+    // row = row + "<td class=''>"+ content.content + "</td>";
+    // <input type='text' class='form-control' id='replyContent' key='' >
+    // <textarea class="form-control" required="required" rows="2" placeholder="" name="replyContent" id="replyContent"></textarea>
+    row = row + "<td class=''>";
+    row = row + "<textarea type='text' class='form-control' id='replyContent" + content.seq + "' key='" + content.seq + "' value='" + content.content + "' rows='2'>" + content.content + "</textarea>";    
+    row = row + "</td>";
+    
+    
+    row = row + "<td class=''>";
+    
+    row = row + "<div class='btn-group'>                                                                                                                                  ";
+    row = row + "  <button type='button' class='btn btn-danger' onClick='modifyReply(" + content.seq + ")'>수정</button>                                                                                             ";
+    row = row + "  <button type='button' class='btn btn-danger dropdown-toggle dropdown-toggle-split' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>  ";
+    row = row + "    <span class='sr-only'>Toggle Dropdown</span>                                                                                                         ";
+    row = row + "  </button>                                                                                                                                              ";
+    row = row + "  <div class='dropdown-menu'>                                                                                                                            ";
+    row = row + "    <a class='dropdown-item' onClick='deleteReply(" + content.seq + ")'>삭제</a>                                                                                                           ";
+    row = row + "  </div>                                                                                                                                                 ";
+    row = row + "</div>                                                                                                                                                   ";
+    
+    //row = row + "<td class=''>";
+    row = row + "</td>";
+    
+    
+    row = row + "</tr>";
+	
+	return row;
+}
+
+var replyList = null;
+
+function getReplyId(seq){
+	var result = null;
+	$.each(replyList, function(index, item) {	           	
+		if(item.content.seq == seq){
+			console.log(item.content.contentId);			
+			result = item.content.contentId;			
+		}		
+   });
+   return result;
+}
+
+function deleteMainImg(){
+	showModal("이미지 삭제 하시겠습니까?", true, function(){
+		var param = {};        	    
+	    param.contentId = $("#contentId").val();    
+	    param = JSON.stringify(param);
+		
+		$.ajax({
+	        url : "/w1/content/delete_mainimg",
+	        data : param,
+	        type : 'post',
+	        contentType:"application/json; charset=UTF-8",
+	        dataType:"json",
+	        success : function(result){
+	        	console.log("SUCCESS : ", result.code);
+	            if(result.code == "0000"){  
+	            	$("#mainImg").attr("src", result.mainUrl);
+	            }
+	        },
+	        error : function(e){
+	        	console.log(e);
+	        }
+	    });	
+	});
+}
+
+function search(page, perPageNum){
+	// $('#pagination').empty();
+	
+	var param = {};
+    param.contentId = $("#contentId").val();    
+	
+	
+    if(page !=null){
+    	param.page = page;
+    }
+    
+    if(perPageNum !=null){
+    	param.perPageNum = perPageNum;
+    }
+    
+    param = JSON.stringify(param);
+	
+	$('#listBody').empty();
+    $('#pagination').empty();
+    $("#replyContent").val("");
+
+	$.ajax({
+           type: "POST",           
+           url: "/w1/content/reply_list",
+           data: param,
+           contentType:"application/json; charset=UTF-8",
+	       dataType:"json",
+           success: function (data) {
+               console.log("SUCCESS : ", data.code);
+               var results = data.list;
+	           var rows = "";
+	           $.each(results, function(index, item) {	           	
+	           	rows = rows + getRow(item.content, item.count);
+					//console.log(item.content.seq);
+					//console.log(item.count.viewCnt);
+			   });	            
+            	            
+               $('#listBody').append(rows);
+            
+               var paging = getPageDiv(data.paging);	            
+               $('#pagination').append(paging);
+               
+               replyList = results;
+           },
+           error: function (e) {	
+               console.log("ERROR : ", e);
+               alert("처리 중 오류가 발생하였습니다.");
+           }
+       });
+	
+}
+
+function changeContentType(type){
+	var row;
+	if(type=='9000'){
+		$('#noticeDiv').show();
+		$('#vendorDiv').hide();
+	}else{
+		$('#vendorDiv').show();
+		$('#noticeDiv').hide();
+	}
+}
+
+  
+
+
+
+</script>
+
+	<div class=""  th:if="${session.userRole.equals('0000')}">
+		<div class="row">		
+		
+			<div class="col-md-12 col-sm-12">
+				<div class="x_panel">
+					
+					<div class="x_title">
+						<h2>
+							Lesson 상세
+						</h2>
+						<ul class="nav navbar-right panel_toolbox">
+							<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>							
+							<li><a class="close-link"><i class="fa fa-close"></i></a></li>
+						</ul>
+						<div class="clearfix"></div>
+					</div>
+					
+					<div class="x_content">
+						
+						<form class="form-horizontal form-label-left" th:object=${lessonView.lesson} th:action="@{/w1/lesson/save}" method="post" enctype="multipart/form-data" id="form1" name="form1" novalidate>
+							<input type="hidden" name="seq" id="seq" th:value="*{seq}" />
+							<input type="hidden" name="lessonId" id="lessonId" th:value="*{lessonId}" />																				
+							<input type="hidden" name="active" id="active" th:value="*{active}" />
+							<input type="hidden" name="ownerId" id="ownerId" th:value="*{ownerId}" />
+							
+							
+							<span class="section">Lesson Info : <span th:text="*{seq}"></span></span>
+							
+						    <div class="form-group row align-items-center">
+								<label class="control-label col-md-2 col-sm-2 ">Lesson 대구분<span
+									class="required">*</span></label>
+								<div class="col-md-4 col-sm-4 ">
+									 <select required class="form-control" name="category1" id="category1" onchange="changeCategory2(this.value)">    		
+							    			<option th:each="lessonCategory1 : ${T(com.kbeauty.gbt.entity.enums.LessonCategory1).values()}" 
+							        		th:value="${lessonCategory1.code}" th:text="${lessonCategory1.val}"></option>
+									</select>
+								</div>
+								
+								<div class="col-md-6 col-sm-6">
+									<div class="">
+										<label>
+											<input type="checkbox" class="js-switch" name="activeChk" id="activeChk" /> App 게시
+										</label>
+										
+										<label style="margin-left:30px;">
+										순번:
+										</label>
+										<label>
+												<input type="number" class="form-control" placeholder="" name="orders" id="orders" th:value="*{orders}">
+										</label>
+									</div>
+								</div>
+							</div>
+							<div id="category2div" class="form-group row align-items-center" > 
+								<label class="control-label col-md-2 col-sm-2 ">Lesson 소구분<span
+									class="required">*</span></label>
+								<div class="col-md-4 col-sm-4 ">
+								    <select required class="form-control" name="category2" id="category2" >    		
+							    		<option th:each="lessonCategory2 : ${T(com.kbeauty.gbt.entity.enums.LessonCategory2).values()}" 
+							        		th:value="${lessonCategory2.code}" th:text="${lessonCategory2.val}"></option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group row align-items-center">
+								<label class="control-label col-md-2 col-sm-2 ">제목</label>
+								<div class="col-md-10 col-sm-10 ">
+									<input type="text" class="form-control" placeholder="제목" name="title" id="title" th:value="*{title}">
+								</div>
+							</div>
+							<div class="form-group row align-items-center">
+								<label class="control-label col-md-2 col-sm-2 ">내용<span class="required">*</span>
+								</label>
+								<div class="col-md-10 col-sm-10 ">								
+									<textarea class="form-control" required="required" rows="5" placeholder="" name="content" id="content" th:text="*{content}"></textarea>									
+								</div>
+							</div>
+							
+							<div class="form-group row">
+								<label class="control-label col-md-2 col-sm-2 ">기간</label>
+								<div class="col-md-2 col-sm-2 ">	
+									<input type="text" class="form-control" placeholder="시작일자" name="startDate" id="startDate" th:value="*{startDate}">								
+								</div>
+								<div class="col-md-2 col-sm-2 ">
+									<input type="text" class="form-control" placeholder="종료일자" name="endDate" id="endDate" th:value="*{endDate}">									
+								</div>
+							</div>
+							
+							<div class="form-group row align-items-center">
+								<label class="control-label col-md-2 col-sm-2 ">공개 구분<span
+									class="required">*</span></label>
+								<div class="col-md-4 col-sm-4 ">	
+									<select required class="form-control" name="viewType" id="viewType" th:value="*{viewType}">
+										<option value="">선택하세요</option>										
+										<option value="9999" th:selected="*{viewType}=='9999'">전체공개</option>
+										<option value="1000" th:selected="*{viewType}=='1000'">나만보기</option>
+										<option value="2000" th:selected="*{viewType}=='2000'">Follower보기</option>
+										<option value="8000" th:selected="*{viewType}=='8000'">관리자보기</option>
+									</select>
+								</div>
+								<label class="control-label col-md-2 col-sm-2 ">Content 상태<span
+									class="required">*</span></label>
+								<div class="col-md-4 ">
+									<select required class="form-control" name="status" id="status">
+										<option value="">선택하세요</option>
+										<option value="0000" th:selected="*{status}=='0000'">등록</option>	
+									</select>
+								</div>								
+							</div>	
+							
+<!-- 							<div class="form-group row"> -->
+<!-- 								<label class="control-label col-md-2 col-sm-2 ">Link</label> -->
+<!-- 								<div class="col-md-10 col-sm-10 ">									 -->
+<!-- 									<input type="text" class="form-control" placeholder="링크값이 입력되면 상세 페이지 조회 없이 링크로 이동됨" name="mainLink" id="mainLink" th:value="*{mainLink}"> -->
+<!-- 								</div>																 -->
+<!-- 							</div> -->
+														
+<!-- 							<div class="form-group row"> -->
+<!-- 								<label class="control-label col-md-2 col-sm-2 ">대표 이미지</label> -->
+<!-- 								<div class="col-md-4 col-sm-4 "> -->
+<!-- 									<img class='img-responsive' style='width:70px;height:75px;' th:src="*{mainUrl}" id="mainImg"> -->
+<!-- 									<button type="button" class="btn btn-primary" onClick="deleteMainImg()">이미지 삭제</button> -->
+<!-- 								</div>																 -->
+<!-- 								<label class="control-label col-md-2 col-sm-2 ">대표 이미지 변경</label> -->
+<!-- 								<div class="col-md-4 col-sm-4 "> -->
+<!-- 									<input type="file" class="form-control" placeholder="" name="mainUploadFile" id="mainUploadFile" th:value="*{mainFilename}"> > -->
+<!-- 									<input type="file" class="form-control" placeholder="" name="mainUploadFile" id="mainUploadFile" > -->
+<!-- 								</div> -->
+<!-- 							</div> -->
+							<div class="form-group row">
+								<label class="control-label col-md-2 col-sm-2 ">Lesson Face(Category)</label>
+								<div class="col-md-4 col-sm-4 ">
+									<span class="section" style="text-align: left ;padding-right: 10px; border-bottom: 0px solid #e5e5e5;">
+									<i class="fa fa-plus-square" onClick="addLessonFace()" id="addSection"></i><a style="font-size: 0.7em; color: #FF7E7E;">&nbsp;&nbsp; 바로 저장됩니다.</a></span>
+								</div>																
+							</div>	
+							<div class="form-group row">
+								<label class="control-label col-md-2 col-sm-2 ">메이크업 타입</label>
+								<div class="col-md-4 col-sm-4 " id ="lessonFaceTypeDiv">
+								</div>																
+							</div>
+							<div class="form-group row">
+								<label class="control-label col-md-2 col-sm-2 ">피부톤</label>
+								<div class="col-md-4 col-sm-4 " id ="lessonFaceSkinToneDiv">
+								</div>																
+							</div>							
+							<div class="form-group row">
+								<label class="control-label col-md-2 col-sm-2 ">계절컬려</label>
+								<div class="col-md-4 col-sm-4 " id ="lessonFaceSeasonColorDiv">
+								</div>																
+							</div>
+							<div class="form-group row">
+								<label class="control-label col-md-2 col-sm-2 ">얼굴윤곽</label>
+								<div class="col-md-4 col-sm-4 " id ="lessonFaceFaceDiv">
+								</div>																
+							</div>
+							<div class="form-group row">
+								<label class="control-label col-md-2 col-sm-2 ">성별</label>
+								<div class="col-md-4 col-sm-4 " id ="lessonFaceGenderDiv">
+								</div>																
+							</div>
+							<div class="form-group row">
+								<label class="control-label col-md-2 col-sm-2 ">나이</label>
+								<div class="col-md-4 col-sm-4 " id ="lessonFaceAgeDiv">
+								</div>																
+							</div>
+						</div>
+							<div class="control-group row ">								
+								<div class="col-md-12 col-sm-12  justify-content-end" style="display: flex;">
+		                  			<button type="button" class="btn btn-primary" onClick="editLesson()">저장하기</button>
+		                  			
+		                  			<a class="btn btn-app"  onClick="goList()">		                    			
+		                    			<i class="fa fa-list"></i> List
+		                  			</a>
+		                  			<a class="btn btn-app" onClick="deleteLesson()">		                    			
+		                    			<i class="fa fa-remove"></i> Delete
+		                  			</a>
+		                  			
+								</div>
+							</div>
+							
+							<input type="hidden" name="deleteResourceId" id="deleteResourceId" value="" />
+														
+							<div id="resourceTemp" th:each="resource : ${lessonView.resourceList}">
+								<span class="section">Resource : <span th:text="${resource.seq}"></span></span>								
+								<div class="form-group row">									
+									
+									<div class="col-md-12 col-sm-12 " th:if="${resource.resourceType.equals('1000')}">
+										<!--모서리를 둥글게-->
+										<img src="./images/tree.jpg" 
+										th:attr="src=${resource.resourceUrl}"
+										class="img-responsive img-rounded"> 					
+									</div>
+									
+									<div class="col-md-12 col-sm-12 " th:if="${resource.resourceType.equals('1040')}">
+										<!--모서리를 둥글게-->
+										<img src="./images/tree.jpg" 
+										th:attr="src=${resource.resourceUrl}"
+										class="img-responsive img-rounded"> 					
+									</div>
+									
+									<div class="col-md-12 col-sm-12 " th:if="${resource.resourceType.equals('1010')}">
+										<div class="video-container">
+										  	<video width="100%" height="auto" 
+											  id="v1"
+											  th:attr="src=${resource.resourceUrl}"
+											  src="" 
+											  loop muted autoplay 
+											  oncontextmenu="return false;"
+											  playsinline    
+											  preload											  
+											  ></video>											
+										</div>					
+									</div>
+									
+									
+									<div class="col-md-12 col-sm-12 " th:if="${resource.resourceType.equals('1020')}">	
+										<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style>
+										<div class='embed-container'>											
+											<iframe width="560" height="315" th:attr="src=${resource.resourceUrl}" src="https://www.youtube.com/embed/TQvgUW8Ydhs?controls=0" frameborder="0" 
+											allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+										</div>							
+									</div>
+									
+								</div>
+								
+								<div class="form-group row align-items-center">
+									<label class="control-label col-md-2 col-sm-2 ">Resource Category</label>
+									<div class="col-md-10 col-sm-10 ">
+										<input type="text"  readonly class="form-control" placeholder="분류" name="resourceCategory" id="resourceCategory" th:value="${resource.categoryName}">
+									</div>
+								</div>
+								
+								<div class="form-group row align-items-center">
+									<label class="control-label col-md-2 col-sm-2 ">Resource 제목</label>
+									<div class="col-md-10 col-sm-10 ">
+										<input type="text" readonly class="form-control" placeholder="제목" name="resourceTitle" id="resourceTitle" th:value="${resource.resourceTitle}">
+									</div>
+								</div>
+								
+								<div class="form-group row align-items-center">
+									<label class="control-label col-md-2 col-sm-2 ">Resource 내용</label>
+									<div class="col-md-10 col-sm-10 ">
+										<textarea class="form-control" readonly required="required" rows="5" placeholder="" name="resourceContent" id="resourceContent" th:text="${resource.resourceContent}">
+										</textarea>
+									</div>
+								</div>
+								
+								<div class="form-group row">
+									<div class="col-md-12 col-sm-12  justify-content-end" style="display: flex;">	
+									
+										<a class="btn btn-app" style="font-size:1em;">
+										순번:
+											<span th:text="${resource.orders}" style="font-size:1.5em;"></span>
+		                  				</a>
+		                  											
+										<a class="btn btn-app" 
+										th:attr="onClick=|javascript:editResource('${resource.seq}')|"
+										>	
+										  <i class="fa fa-edit"></i> Edit
+			                  			</a>
+			                  						                  			
+			                  			<a class="btn btn-app" 
+			                  			th:attr="onClick=|javascript:deleteResource('${resource.contentId}', '${resource.resourceId}')|"
+			                  			>		                    			
+			                    			<i class="fa fa-remove"></i> Delete
+			                  			</a>	
+									</div>									
+								</div>
+							</div>
+							
+							</form>
+							
+							<span class="section" style="text-align: right;padding-right: 10px;"><i class="fa fa-plus-square" onClick="addResource()" id="addSection"></i></span>
+							
+							<!-- --------- resource 추가 모달 start --------  -->
+							<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="resourceForm">
+							    <input type="hidden" name="resourceSeqM" id="resourceSeqM" value="0" />
+							    <input type="hidden" name="contentIdM" id="contentIdM" value="" />
+							    <input type="hidden" name="resourceIdM" id="resourceIdM" value="" />
+							    <input type="hidden" name="resourceIdM" id="resourceIdM" value="" />
+							    
+			                    <div class="modal-dialog modal-lg">
+			                      <div class="modal-content">
+			                        <div class="modal-header">
+			                          <h4 class="modal-title" id="myModalLabel">Resource <span id="resourceSeqSpan"></span></h4>
+			                          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+			                          </button>
+			                        </div>
+			                        
+			                        <div class="modal-body">
+									  <div class="form-group row">
+										<label class="control-label col-md-3 col-sm-3 ">Resource 구분<span class="required">*</span>
+										</label>
+										<div class="col-md-5 col-sm-5 ">
+											<select required class="form-control" name="resourceTypeM" id="resourceTypeM">
+												<option value="">선택하세요</option>
+												<option value="1000">이미지</option>
+												<option value="1010">동영상</option>
+												<option value="1020">YouTube</option>
+												<option value="1040">제품순번</option>
+												<option value="1050">TEXT</option>
+											</select>
+										</div>		
+									  </div>
+									  
+									   <div class="form-group row">
+										<label class="control-label col-md-3 col-sm-3 ">Resource Category <span class="required"></span>
+										</label>
+										<div class="col-md-5 col-sm-5 ">
+											<select required class="form-control" name="resourceCategoryM" id="resourceCategoryM">
+												<option value="9999">해당없음</option>
+												<option value="0000">베이스</option>
+												<option value="1000">립</option>
+												<option value="2000">눈</option>
+												<option value="3000">눈썹</option>
+											</select>
+										</div>		
+									  </div>
+									   <div class="form-group row">
+										<label class="control-label col-md-3 col-sm-3 " style="color:#FF7E7E;">* 주의사항 *<span class="required"></span>
+										</label>
+										<div class="col-md-5 col-sm-5 ">
+											<span style="color: #FF7E7E;"> 실습의 메인 영상은 해당없음으로 체크하셔야 합니다.</span>
+										</div>		
+									  </div>
+									  <div class="form-group row ">
+										<label class="control-label col-md-3 col-sm-3 ">Resource 제목<span class="required">*</span></label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="text" class="form-control" placeholder="제목" name="resourceTitleM" id="resourceTitleM">
+										</div>
+								      </div>
+									  <div class="form-group row">
+										<label class="control-label col-md-3 col-sm-3 ">Resource 내용<span class="required">*</span></label>
+										<div class="col-md-9 col-sm-9 ">								
+											<textarea class="form-control" required="required" rows="5" placeholder="" name="resourceContentM" id="resourceContentM"></textarea>
+										</div>
+									  </div>							
+									  
+									  <div class="form-group row ">
+										<label class="control-label col-md-3 col-sm-3 ">순번</label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="text" class="form-control" value="0" name="resourceOrderM" id="resourceOrderM">											
+										</div>
+									  </div>		
+									  
+									  <div class="form-group row ">
+										<label class="control-label col-md-3 col-sm-3 ">Link/YouTube Url</label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="text" class="form-control" placeholder="" name="urlM" id="urlM">
+										</div>
+									  </div>
+									  
+									  <div class="form-group row ">
+										<label class="control-label col-md-3 col-sm-3 ">Resource</label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="file" class="form-control" placeholder="" name="fileNameM" id="fileNameM">
+										</div>
+									  </div>									  
+			                        </div>
+			                        
+									<div class="modal-footer">
+			                          <button type="button" class="tn btn-primary" onClick="saveResource()">저장하기</button>
+			                          <button type="button" class="btn btn-secondary" onClick = "hideResource()">닫기</button>			                          
+			                        </div>
+			
+			                      </div>
+			                    </div>
+			                </div>
+							<!-- --------- resource 추가 모달 end --------  -->
+							
+							
+							
+							
+									<!-- --------- LessonFace 추가 모달 start --------  -->
+							<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="lessonFaceForm">
+							    <input type="hidden" name="lessonFaceSeqM" id="lessonFaceSeqM" value="0" />
+							    <input type="hidden" name="lessonIdM" id="lessonIdM" value="" />
+							    
+			                    <div class="modal-dialog modal-lg">
+			                      <div class="modal-content">
+			                        <div class="modal-header">
+			                          <h4 class="modal-title" id="myModalLabel">LessonFace  <span id="lessonFaceSeqSpan"></span></h4>
+			                          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+			                          </button>
+			                        </div>
+			                        
+			                        <div class="modal-body">
+									  <div class="form-group row">
+										<label class="control-label col-md-3 col-sm-3 ">LessonFace 구분<span class="required">*</span>
+										</label>
+										<div class="col-md-5 col-sm-5 ">
+											<select required class="form-control" name="lessonFaceTypeM" id="lessonFaceTypeM" onchange="changeLessonFaceCategory()">
+												<option value="5000" >메이크업 타입</option>
+												<option value="3000">피부톤</option>
+												<option value="2000">계절컬러</option>
+												<option value="1000">얼굴윤곽</option>
+												<option value="4000">성별</option>
+												<option value="0000">나이</option>
+											</select>
+										</div>		
+									  </div>
+									    <div class="form-group row">
+										<label class="control-label col-md-3 col-sm-3 ">LessonFace 소구분<span class="required">*</span>
+										</label>
+										<div class="col-md-5 col-sm-5 ">
+											<select required class="form-control" name="lessonFaceCategoryM" id="lessonFaceCategoryM">
+												<option value="0000">청순꾸안꾸</option>
+												<option value="1000">힙한</option>
+												<option value="2000">분위기있는</option>
+												<option value="3000">사랑스러운</option>
+												<option value="4000">과즙상</option>
+												<option value="5000">단아한</option>
+												<option value="6000">그윽한</option>
+												<option value="7000">시크한</option>
+												<option value="8000">고급스러운</option>
+												<option value="9000">우아한</option>
+											</select>
+										</div>		
+									  </div>
+			                        </div>
+			                        
+									<div class="modal-footer">
+			                          <button type="button" class="btn btn-primary" onClick="saveLessonFace()">저장하기</button>
+			                          <button type="button" class="btn btn-secondary" onClick = "hideLessonFace()">닫기</button>			                          
+			                        </div>
+			
+			                      </div>
+			                    </div>
+			                </div>
+							<!-- --------- LessonFace 추가 모달 end --------  -->
+
+							<!-- --------- 댓글 관리 모달 start --------  -->
+							<div class="modal fade modeless" tabindex="-1" role="dialog" aria-hidden="true" id="replyForm">
+							    
+			                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+			                      <div class="modal-content">
+			                        <div class="modal-header">
+			                          <h4 class="modal-title" id="myModalLabel">댓글 <span id="resourceSeqSpan"></span></h4>
+			                          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+			                          </button>
+			                        </div>
+			                        
+			                        <div class="modal-body">
+									
+									 <span class="section"></span>	
+									 
+									 <div class="table-responsive" style="margin-bottom: 16px;">
+									    <table class="table table-striped jambo_table bulk_action">
+									      <thead>
+									        <tr class="headings">									          
+									          <th class="column-title">순번 </th>
+									          <th class="column-title">등록자</th>
+									          <th class="column-title">등록자명</th>
+									          <th class="column-title">댓글내용</th>
+									          <th class="column-title">구분</th>
+									        </tr>
+									      </thead>
+									      <tbody id="listBody">            
+									      </tbody>
+									    </table>									    
+									    <div class="col-md-12 col-sm-12" id="pagination" style="display: flex;justify-content: center;">
+										   <div class="row">
+									            <div class="btn-group" role="group">
+									              <button type="button" class="btn btn-secondary">이전</button>
+										              <button type="button" class="btn btn-secondary">1</button>
+										              <button type="button" class="btn btn-secondary">2</button>
+										              <button type="button" class="btn btn-secondary">3</button>
+									              <button type="button" class="btn btn-secondary">다음</button>
+									            </div>
+									           </div>
+								     	</div> 
+								 </div>
+									 
+									 <span class="section"></span>
+									 <div class="form-group row">
+										<label class="control-label col-md-2 col-sm-2 ">댓글입력<span class="required">*</span></label>
+										<div class="col-md-10 col-sm-10 ">								
+											<textarea class="form-control" required="required" rows="2" placeholder="" name="replyContent" id="replyContent"></textarea>
+										</div>
+									 </div> 
+									<div class="modal-footer">
+			                          <button type="button" class="btn btn-primary" onClick="saveReply()">저장하기</button>
+			                          <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>			                          
+			                        </div>
+			                      </div>
+			                    </div>
+			                </div>
+							<!-- --------- 댓글 관리 모달 end --------  -->
+					</div>
+				</div>
+			</div>
+				<!-- -----------------  -->
+		</div>
+	</div>
+	
+	
+ 
+</th:block>
+
+    
+</html>

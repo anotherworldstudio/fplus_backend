@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.kbeauty.gbt.dao.UserMapper">
+
+	<resultMap id="userListViewResultMap" type="com.kbeauty.gbt.entity.view.UserListView">  
+	  <result property="seq" column="seq"/>  
+	  <result property="userId" column="userid"/>
+	  <result property="userName" column="username"/>
+	  <result property="birthDay" column="birthday"/>  
+	  <result property="sex" column="sex"/>
+	  <result property="country" column="country"/>
+	  <result property="cellphone" column="cellphone"/>
+	  <result property="email" column="email"/>  
+	  <result property="addreName" column="addrename"/>
+	  <result property="addreType" column="addretype"/>
+	  <result property="zipcode" column="zipcode"/>
+	  <result property="addre" column="addre"/>  
+	  <result property="addreDetail" column="addredetail"/>
+	  <result property="userRole" column="userrole"/>
+	  <result property="imageDir" column="imagedir"/>
+	  <result property="imageName" column="imagename"/>
+	  <result property="comment" column="comment"/>  
+	  <result property="language" column="language"/>
+	  <result property="oauthType" column="oauthtype"/>  
+	  <result property="status" column="status"/>
+	  <result property="keepLoginyn" column="keeploginyn"/>
+	  <result property="agreeYn" column="agreeyn"/>
+	  <result property="privateYn" column="privateyn"/>
+	  <result property="ageoverYn" column="ageoveryn"/>  
+	  <result property="marketingYn" column="marketingyn"/>
+	  <result property="loginType" column="logintype"/>
+	</resultMap>
+	
+	<resultMap id="followResultMap" type="com.kbeauty.gbt.entity.domain.Follow">  
+	  <result property="seq" column="seq"/>  
+	  <result property="followId" column="followid"/>
+	  <result property="followType" column="followtype"/>
+	  <result property="userId" column="userid"/>
+	  <result property="followerId" column="followerid"/>  
+	  <result property="reqType" column="reqtype"/>
+	  <result property="resType" column="restype"/>	  
+	  <result property="followYn" column="followyn"/>
+	</resultMap>
+	
+	<resultMap id="followListResultMap" type="com.kbeauty.gbt.entity.view.FollowListView">  
+		<result  property="seq"  column="seq"/>
+		<result  property="followId"  column="followid"/>
+		<result  property="followType"  column="followtype"/>
+		<result  property="userId"  column="userid"/>
+		<result  property="followerId"  column="followerid"/>
+		<result  property="reqType"  column="reqtype"/>
+		<result  property="reqBlock"  column="reqblock"/>
+		<result  property="resType"  column="restype"/>
+		<result  property="resBlock"  column="resblock"/>
+		<result  property="followYn"  column="followyn"/>
+		<result  property="userName"  column="username"/>
+		<result  property="sex"  column="sex"/>
+		<result  property="cellphone"  column="cellphone"/>
+		<result  property="email"  column="email"/>
+		<result  property="imageDir"  column="imagedir"/>
+		<result  property="imageName"  column="imagename"/>
+		<result  property="status"  column="status"/>
+		<result  property="loginType"  column="logintype"/>
+	</resultMap>
+	
+
+    <select id="getUserList" parameterType="com.kbeauty.gbt.entity.view.UserCondition"  
+                                resultMap="userListViewResultMap">
+        select * from USER where 1 = 1       
+	    
+	    <if test='cellphone != null &amp;&amp; !"".equals(cellphone)'>
+    		and cellphone = #{cellphone}
+  		</if>  		
+  	    <if test='userName != null &amp;&amp; !"".equals(userName)'>
+    		and username LIKE CONCAT(#{userName},'%')
+  		</if>  		
+  		<if test='email != null &amp;&amp; !"".equals(email)'>
+    		and email = #{email}
+  		</if>  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and status = #{status}
+  		</if>  		
+  		<if test='userRole != null &amp;&amp; !"".equals(userRole)'>
+    		and userrole = #{userRole}
+  		</if>
+  		<if test='marketingYn != null &amp;&amp; !"".equals(marketingYn)'>
+    		and marketingyn = #{marketingYn}
+  		</if>  		
+  		
+        ORDER BY seq desc 
+		limit #{pageStart}, #{perPageNum}
+    </select>    
+    
+    <select id="getUserListCnt" parameterType="com.kbeauty.gbt.entity.view.UserCondition" 
+                                resultType="java.lang.Integer">
+        select count(*) as cnt from USER where 1 = 1        
+	    <if test='cellphone != null &amp;&amp; !"".equals(cellphone)'>
+    		and cellphone = #{cellphone}
+  		</if>  		
+  	    <if test='userName != null &amp;&amp; !"".equals(userName)'>
+    		and username LIKE CONCAT(#{userName},'%')
+  		</if>  		
+  		<if test='email != null &amp;&amp; !"".equals(email)'>
+    		and email = #{email}
+  		</if>  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and status = #{status}
+  		</if>  		
+  		<if test='userRole != null &amp;&amp; !"".equals(userRole)'>
+    		and userrole = #{userRole}
+  		</if>
+  		<if test='marketingYn != null &amp;&amp; !"".equals(marketingYn)'>
+    		and marketingyn = #{marketingYn}
+  		</if>  		
+    </select>   
+    
+    <select id="getUserMap" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select userid, username from USER where 
+        <choose>
+            <when test="userList.size != 0">
+                userid in  
+                <foreach collection="userList" item="item" index="index" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </when>
+            <otherwise>
+            	1 = 2
+            </otherwise>            
+        </choose>       
+	 
+    </select>
+
+    <select id="getUserObjMap" parameterType="java.util.HashMap" resultMap="userListViewResultMap">
+        select * from USER where 
+        <choose>
+            <when test="userList.size != 0">
+                userid in  
+                <foreach collection="userList" item="item" index="index" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </when>
+            <otherwise>
+            	1 = 2
+            </otherwise>            
+        </choose>       
+	 
+    </select>        
+        
+    <select id="getOldFollowByUserId" parameterType="com.kbeauty.gbt.entity.domain.Follow" resultMap="followResultMap">
+        SELECT * FROM FOLLOW WHERE userid = #{userId} AND followerid = #{followerId} and followtype = '0000'
+    </select>
+    
+    <select id="getBlockByUserId" parameterType="java.lang.String" resultMap="followResultMap">
+        SELECT * FROM FOLLOW WHERE userid = #{userId} AND followerid = #{blockUserid} and followtype = '1000'
+    </select>
+    
+    <!-- Join에서는 상대방의 사용자 정보를 가지고 와야하기 때문에 userId와 user테이블 연결 -->
+    <select id="getFollowList" parameterType="com.kbeauty.gbt.entity.view.FollowCondition" resultMap="followListResultMap">
+    	SELECT  
+			 A.seq
+			,followId
+			,followType	
+			,A.userId
+			,followerId	
+			,reqType
+			,reqBlock
+			,resType
+			,resBlock	
+			,followYn
+			,userName	
+			,sex	
+			,cellphone
+			,email
+			,imageDir
+			,imageName	
+			,status
+			,loginType	
+		FROM FOLLOW AS A INNER JOIN USER AS B 
+		ON A.userid = B.userid 
+		WHERE B.delyn IS NULL and resBlock = 'N' and resType in ('R', 'C')
+    	<if test='followId != null &amp;&amp; !"".equals(followId)'>
+    		and followid = #{followId}
+  		</if>
+    	<if test='userName != null &amp;&amp; !"".equals(userName)'>
+    		and B.username = #{userName}
+  		</if>
+    	<if test='followType != null &amp;&amp; !"".equals(followType)'>
+    		and followtype = #{followType}
+  		</if>
+    	<if test='reqType != null &amp;&amp; !"".equals(reqType)'>
+    		and reqtype = #{reqType}
+  		</if>
+    	<if test='resType != null &amp;&amp; !"".equals(resType)'>
+    		and restype = #{resType}
+  		</if>
+    	<if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and A.userid = #{userId}
+  		</if>
+    	<if test='followerId != null &amp;&amp; !"".equals(followerId)'>
+    		and A.followerid = #{followerId}
+  		</if>
+  		
+    	ORDER BY A.seq desc 
+		limit #{pageStart}, #{perPageNum}     
+    </select>
+    
+    <select id="getFollowListCnt" parameterType="com.kbeauty.gbt.entity.view.FollowCondition" resultType="java.lang.Integer">
+    	SELECT  
+			 count(*) as cnt
+		FROM FOLLOW AS A INNER JOIN USER AS B ON A.userid = B.userid 
+		WHERE B.delyn IS NULL  and resBlock = 'N'  and resType in ('R', 'C')
+    	<if test='followId != null &amp;&amp; !"".equals(followId)'>
+    		and followid = #{followId}
+  		</if>
+    	<if test='userName != null &amp;&amp; !"".equals(userName)'>
+    		and username = #{userName}
+  		</if>
+    	<if test='followType != null &amp;&amp; !"".equals(followType)'>
+    		and followtype = #{followType}
+  		</if>
+    	<if test='reqType != null &amp;&amp; !"".equals(reqType)'>
+    		and reqtype = #{reqType}
+  		</if>
+    	<if test='resType != null &amp;&amp; !"".equals(resType)'>
+    		and restype = #{resType}
+  		</if>
+    	<if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and A.userid = #{userId}
+  		</if>
+    	<if test='followerId != null &amp;&amp; !"".equals(followerId)'>
+    		and A.followerid = #{followerId}
+  		</if>     
+    </select>
+	
+	<!-- Join에서는 상대방의 사용자 정보를 가지고 와야하기 때문에 followerId와 user테이블 연결 -->
+    <select id="getFollowingList" parameterType="com.kbeauty.gbt.entity.view.FollowCondition" resultMap="followListResultMap">
+    	SELECT  
+			 A.seq
+			,followId
+			,followType	
+			,A.userId
+			,followerId	
+			,reqType
+			,reqBlock
+			,resType
+			,resBlock	
+			,followYn
+			,userName	
+			,sex	
+			,cellphone
+			,email
+			,imageDir
+			,imageName	
+			,status
+			,loginType	
+		FROM FOLLOW AS A INNER JOIN USER AS B ON A.followerId = B.userid 
+		WHERE B.delyn IS NULL and reqBlock = 'N' and reqType in ('R', 'C')
+    	<if test='followId != null &amp;&amp; !"".equals(followId)'>
+    		and followid = #{followId}
+  		</if>
+    	<if test='userName != null &amp;&amp; !"".equals(userName)'>
+    		and B.username = #{userName}
+  		</if>
+    	<if test='followType != null &amp;&amp; !"".equals(followType)'>
+    		and followtype = #{followType}
+  		</if>
+    	<if test='reqType != null &amp;&amp; !"".equals(reqType)'>
+    		and reqtype = #{reqType}
+  		</if>
+    	<if test='resType != null &amp;&amp; !"".equals(resType)'>
+    		and restype = #{resType}
+  		</if>
+    	<if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and A.userid = #{userId}
+  		</if>
+    	<if test='followerId != null &amp;&amp; !"".equals(followerId)'>
+    		and A.followerid = #{followerId}
+  		</if>
+  		
+    	ORDER BY A.seq desc 
+		limit #{pageStart}, #{perPageNum}     
+    </select>
+    
+    <select id="getFollowingListCnt" parameterType="com.kbeauty.gbt.entity.view.FollowCondition" resultType="java.lang.Integer">
+    	SELECT  
+			 count(*) as cnt
+		FROM FOLLOW AS A INNER JOIN USER AS B ON A.followerId = B.userid 
+		WHERE B.delyn IS NULL  and reqBlock = 'N' and reqType in ('R', 'C')
+    	<if test='followId != null &amp;&amp; !"".equals(followId)'>
+    		and followid = #{followId}
+  		</if>
+    	<if test='userName != null &amp;&amp; !"".equals(userName)'>
+    		and username = #{userName}
+  		</if>
+    	<if test='followType != null &amp;&amp; !"".equals(followType)'>
+    		and followtype = #{followType}
+  		</if>
+    	<if test='reqType != null &amp;&amp; !"".equals(reqType)'>
+    		and reqtype = #{reqType}
+  		</if>
+    	<if test='resType != null &amp;&amp; !"".equals(resType)'>
+    		and restype = #{resType}
+  		</if>
+    	<if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and A.userid = #{userId}
+  		</if>
+    	<if test='followerId != null &amp;&amp; !"".equals(followerId)'>
+    		and A.followerid = #{followerId}
+  		</if>     
+    </select>
+    
+    <select id="getFollowSet" parameterType="java.util.HashMap" resultType="java.lang.String">
+        SELECT distinct userid FROM FOLLOW WHERE followerid = #{userId} AND followtype = '0000' AND restype = 'C'         
+        AND      
+        <choose>
+            <when test="userList.size != 0">
+                userid in  
+                <foreach collection="userList" item="item" index="index" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </when>
+            <otherwise>
+            	1 = 2
+            </otherwise>            
+        </choose>       
+	 
+    </select>
+    
+    <select id="getFollowingSet" parameterType="java.util.HashMap" resultType="java.lang.String">        
+        SELECT distinct followerid FROM FOLLOW WHERE userid = #{userId}  AND followtype = '0000'  AND reqtype = 'C'       
+        AND      
+        <choose>
+            <when test="userList.size != 0">
+                followerid in  
+                <foreach collection="userList" item="item" index="index" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </when>
+            <otherwise>
+            	1 = 2
+            </otherwise>            
+        </choose>       
+	 
+    </select>
+
+    
+    <!-- 사용자 상세에서 사용함 --> 
+    <select id="getFollowingCnt" parameterType="com.kbeauty.gbt.entity.view.UserCondition" 
+                                resultType="java.lang.Integer">
+        select count(*) as cnt from FOLLOW WHERE userid = #{userId} AND reqType = 'C'        
+        
+    </select>
+    
+    <!-- 사용자 상세에서 사용함 -->
+    <select id="getFollowCnt" parameterType="com.kbeauty.gbt.entity.view.UserCondition" 
+                                resultType="java.lang.Integer">
+        select count(*) as cnt from FOLLOW WHERE followerid = #{userId} AND resType = 'C'        
+        
+    </select>
+
+    <select id="getLikeCnt" parameterType="com.kbeauty.gbt.entity.view.UserCondition" 
+                                resultType="java.lang.Integer">
+
+        SELECT COALESCE(SUM(likecnt), 0) as cnt FROM CONTENT AS A INNER JOIN COUNT AS B 
+        ON A.contentid = B.contentid 
+        WHERE A.ownerid = #{userId} 
+        AND A.delyn IS null
+        
+    </select>
+    
+    <select id="searchUserName" parameterType="com.kbeauty.gbt.entity.view.UserCondition"  
+                                    resultMap="userListViewResultMap">
+    	SELECT userid, username FROM USER WHERE username LIKE CONCAT(#{userName},'%') and delYn is null limit #{perPageNum}
+    </select>
+    
+   <select id="getModelEventList" parameterType="com.kbeauty.gbt.entity.view.ModelCondition" resultType="com.kbeauty.gbt.entity.view.ModelUserList">
+    	SELECT * from 
+    	(
+	    	SELECT content_user as userId, COUNT(DISTINCT contentid) as feedCnt, COUNT(*) as likeCnt
+			FROM 
+			(
+				SELECT distinct A.ownerid AS content_user , A.contentid, B.ownerid 
+				FROM CONTENT AS A LEFT OUTER JOIN LIKES AS B ON A.contentid = B.contentid  AND B.liketype = '0000'
+				WHERE A.delyn IS null 
+				  AND A.contenttype = '1000'
+				  
+			) AA
+			GROUP BY content_user    	
+  		) BB  		
+    	ORDER BY feedCnt desc    	 
+		limit #{pageStart}, #{perPageNum}     
+    </select>
+    
+    <select id="getModelEventListCnt" parameterType="com.kbeauty.gbt.entity.view.ModelCondition" resultType="java.lang.Integer">
+    	SELECT count(*) as cnt from 
+    	(
+	    	SELECT content_user as userId, COUNT(DISTINCT contentid) as feedCnt, COUNT(*) as likeCnt
+			FROM 
+			(
+				SELECT distinct A.ownerid AS content_user , A.contentid, B.ownerid 
+				FROM CONTENT AS A LEFT OUTER JOIN LIKES AS B ON A.contentid = B.contentid  AND B.liketype = '0000'
+				WHERE A.delyn IS null 
+				  AND A.contenttype = '1000'
+			) AA
+			GROUP BY content_user    	
+  		) BB 
+    </select>
+    
+     <select id="getUserFaceList" parameterType="com.kbeauty.gbt.entity.view.UserCondition"  
+                                resultType="com.kbeauty.gbt.entity.domain.UserFace">
+        SELECT * FROM USERFACE where delyn IS NULL    
+	    
+	    <if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and userid = #{userId}
+  		</if>  		
+  		
+        ORDER BY seq desc 
+    </select>    
+    
+      <select id="findByUserAppleKey" parameterType="com.kbeauty.gbt.entity.domain.User"  
+                                resultType="com.kbeauty.gbt.entity.domain.User">
+        SELECT * FROM USER where userapplekey = #{userAppleKey} and oauthtype = #{oauthType}
+    </select>   
+    
+    
+    
+    
+
+</mapper>

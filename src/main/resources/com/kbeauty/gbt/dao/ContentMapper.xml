@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.kbeauty.gbt.dao.ContentMapper">
+
+	<resultMap id="contentListResultMap" type="com.kbeauty.gbt.entity.domain.Content">  
+		<result property="seq" column="seq"/>
+		<result property="contentId" column="contentid"/>
+		<result property="contentType" column="contenttype"/>
+		<result property="local" column="local"/>
+		<result property="ownerId" column="ownerid"/>
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="viewType" column="viewtype"/>
+		<result property="replyYn" column="replyyn"/>
+		<result property="latitude" column="latitude"/>
+		<result property="longitude" column="longitude"/>
+		<result property="geoName" column="geoname"/>
+		<result property="consumerId" column="consumerid"/>
+		<result property="ip" column="ip"/>
+		<result property="path" column="path"/>
+		<result property="depth" column="depth"/>
+		<result property="active" column="active"/>
+		<result property="status" column="status"/>
+		<result property="orders" column="orders"/>
+	</resultMap>
+	
+	<resultMap id="likeListResultMap" type="com.kbeauty.gbt.entity.domain.Likes">  
+		<result property="seq" column="seq"/>
+		<result property="contentId" column="contentid"/>
+		<result property="resourceId" column="resourceid"/>
+		<result property="likeType" column="liketype"/>
+		<result property="likeId" column="likeid"/>
+		<result property="ownerId" column="ownerid"/>
+	</resultMap>
+	
+	<resultMap id="resourcesListResultMap" type="com.kbeauty.gbt.entity.domain.Resources">  
+		<result property="seq" column="seq"/>
+		<result property="contentId" column="contentid"/>
+		<result property="resourceId" column="resourceid"/>
+		<result property="resourceType" column="resourcetype"/>
+		<result property="resourceName" column="resourcename"/>
+		<result property="resourceTitle" column="resourcetitle"/>
+		<result property="resourceContent" column="resourcecontent"/>
+	</resultMap>
+	
+	<resultMap id="classListResultMap" type="com.kbeauty.gbt.entity.view.ClassView">  		
+		<result property="classId"   column="classid"/>
+		<result property="classType" column="classtype"/>
+		<result property="className" column="classname"/>
+		<result property="level"     column="level"/>
+		<result property="middleId"  column="middleid"/>
+		<result property="middleName" column="middlename"/>
+		<result property="subId"      column="subid"/>
+		<result property="subName"    column="subname"/>
+	</resultMap>
+	
+
+	<resultMap id="peerProductInfoResultMap" type="com.kbeauty.gbt.entity.domain.Others">  
+	  <result property="otherCode" column="contentid"/>  
+	  <result property="title" column="title"/>  
+	  
+	  <result property="otherValue" column="maindir"/>  
+	  <result property="otherName" column="mainfilename"/>  
+	  <result property="curr" column="curr"/>  
+	  <result property="price" column="price"/>  
+	  <result property="priceUrl" column="priceurl"/>  
+	</resultMap>
+
+    <select id="getContentList" parameterType="com.kbeauty.gbt.entity.view.ContentCondition"  
+                                resultMap="contentListResultMap">
+        select * from CONTENT 
+        
+        <![CDATA[
+        where path < #{path} and depth = 0 
+        ]]>
+        
+           <if test='contentSeq>0'>
+        	and seq = #{contentSeq}
+        </if>
+        
+        <if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+	    
+	    <if test='active != null &amp;&amp; !"".equals(active)'>
+    		and active = #{active}
+  		</if>
+  		  		
+	    <if test='consumerId != null &amp;&amp; !"".equals(consumerId)'>
+    		and consumerid = #{consumerId}
+  		</if>
+  		  		
+	    <if test='contentType != null &amp;&amp; !"".equals(contentType)'>
+    		and contenttype = #{contentType}
+  		</if>
+  		  		
+	    <if test='ownerId != null &amp;&amp; !"".equals(ownerId)'>
+    		and ownerid = #{ownerId}
+  		</if>
+  		  		
+	    <if test='replyYn != null &amp;&amp; !"".equals(replyYn)'>
+    		and replyyn = #{replyYn}
+  		</if>
+  		  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and status = #{status}
+  		</if>
+  		  		
+	    <if test='viewType != null &amp;&amp; !"".equals(viewType)'>
+    		and viewtype = #{viewType}
+  		</if>
+  		  	
+	    <if test='category1 != null &amp;&amp; !"".equals(category1)'>
+    		and category1 = #{category1}
+  		</if>  	
+  		
+	    <if test='category2 != null &amp;&amp; !"".equals(category2)'>
+    		and category2 = #{category2}
+  		</if>  	  	    
+	    
+	    <if test='category3 != null &amp;&amp; !"".equals(category3)'>
+    		and category3 = #{category3}
+  		</if> 	    
+  		  	  	    
+	    <if test='vendor != null &amp;&amp; !"".equals(vendor)'>    		
+    		and vendor like CONCAT(#{vendor},'%')
+  		</if>  	    
+  		
+  	    <if test='title != null &amp;&amp; !"".equals(title)'>
+    		and title like CONCAT(#{title},'%')
+  		</if>
+  		
+  		 <if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>
+    		and ownerid = (SELECT userid FROM USER WHERE username = #{searchUserName})
+  		</if>
+  		
+  	    <choose>	
+  	    
+			<when test ='"2000".equals(ordersType)'>
+				ORDER BY orders = 0  ASC,orders asc, path desc
+			</when>
+			
+			<when test='gradeOrder == true'>
+				ORDER BY reviewgrade desc, path desc
+			</when>
+			
+			<when test='seqOrder == true'>
+				ORDER BY path desc
+			</when>
+			
+			<otherwise>
+				ORDER BY path desc
+			</otherwise>
+		</choose> 
+        
+        
+		limit #{pageStart}, #{perPageNum}
+    </select>
+    
+    <select id="getContentListCnt" parameterType="com.kbeauty.gbt.entity.view.ContentCondition"  
+                               resultType="java.lang.Integer">
+        select count(*) as cnt from CONTENT 
+        
+        where  depth = 0 
+	    
+	    <if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+	    
+	    <if test='active != null &amp;&amp; !"".equals(active)'>
+    		and active = #{active}
+  		</if>
+  		  		
+	    <if test='consumerId != null &amp;&amp; !"".equals(consumerId)'>
+    		and consumerid = #{consumerId}
+  		</if>
+  		  		
+	    <if test='contentType != null &amp;&amp; !"".equals(contentType)'>
+    		and contenttype = #{contentType}
+  		</if>
+  		  		
+	    <if test='ownerId != null &amp;&amp; !"".equals(ownerId)'>
+    		and ownerid = #{ownerId}
+  		</if>
+  		  		
+	    <if test='replyYn != null &amp;&amp; !"".equals(replyYn)'>
+    		and replyyn = #{replyYn}
+  		</if>
+  		  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and status = #{status}
+  		</if>
+  		  		
+	    <if test='viewType != null &amp;&amp; !"".equals(viewType)'>
+    		and viewtype = #{viewType}
+  		</if>  	
+
+	    <if test='category1 != null &amp;&amp; !"".equals(category1)'>
+    		and category1 = #{category1}
+  		</if>  	
+  		
+	    <if test='category2 != null &amp;&amp; !"".equals(category2)'>
+    		and category2 = #{category2}
+  		</if>  	  	    
+	    
+	    <if test='category3 != null &amp;&amp; !"".equals(category3)'>
+    		and category3 = #{category3}
+  		</if> 	    
+  		  	  	    
+	    <if test='vendor != null &amp;&amp; !"".equals(vendor)'>    		
+    		and vendor like CONCAT(#{vendor},'%')
+  		</if>  	   
+  		
+  	    <if test='title != null &amp;&amp; !"".equals(title)'>
+    		and title like CONCAT(#{title},'%')
+  		</if>  		
+  		
+  		 <if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>
+    		and ownerid = (SELECT userid FROM USER WHERE username = #{searchUserName})
+  		</if> 
+  		
+    </select>    
+    
+    <select id="getFollowContentList" parameterType="com.kbeauty.gbt.entity.view.ContentCondition"  
+                                resultMap="contentListResultMap">
+        
+		select A.* from FOLLOW AS A 
+			INNER JOIN CONTENT AS B ON A.followerid  = B.ownerid  			
+        <![CDATA[        
+		WHERE A.userid = #{searchUserid} and path < #{path}
+          AND viewtype IN ('9999','2000')
+		]]>
+        
+        <if test='delYn == null'>
+	    	and B.delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and B.delyn = #{delYn}
+	    </if>
+	    
+	    <if test='active != null &amp;&amp; !"".equals(active)'>
+    		and B.active = #{active}
+  		</if>
+  		  		
+	    <if test='contentType != null &amp;&amp; !"".equals(contentType)'>
+    		and B.contenttype = #{contentType}
+  		</if>  		  		
+  		  		
+	    <if test='replyYn != null &amp;&amp; !"".equals(replyYn)'>
+    		and B.replyyn = #{replyYn}
+  		</if>
+  		  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and B.status = #{status}
+  		</if>  		  		
+  	    
+        ORDER BY path desc 
+		limit #{pageStart}, #{perPageNum}
+    </select>
+    
+    <select id="getFollowContentListCnt" parameterType="com.kbeauty.gbt.entity.view.ContentCondition"  
+                                            resultType="java.lang.Integer">
+        
+        select count(*) as cnt from FOLLOW AS A 
+		
+			INNER JOIN CONTENT AS B ON A.followerid  = B.ownerid  			
+        
+		WHERE A.userid = #{searchUserid} AND viewtype IN ('9999','2000')
+		
+        <if test='delYn == null'>
+	    	and B.delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and B.delyn = #{delYn}
+	    </if>
+	    
+	    <if test='active != null &amp;&amp; !"".equals(active)'>
+    		and B.active = #{active}
+  		</if>
+  		  		
+	    <if test='contentType != null &amp;&amp; !"".equals(contentType)'>
+    		and B.contenttype = #{contentType}
+  		</if>  		  		
+  		  		
+	    <if test='replyYn != null &amp;&amp; !"".equals(replyYn)'>
+    		and B.replyyn = #{replyYn}
+  		</if>
+  		  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and B.status = #{status}
+  		</if>  		
+  		
+    </select>    
+    
+    <select id="getReplyList" parameterType="com.kbeauty.gbt.entity.view.ContentCondition"  
+                            resultMap="contentListResultMap">
+    	
+    	SELECT * FROM CONTENT 
+    	WHERE path LIKE CONCAT(#{path},'%')    	 
+    	AND depth > 0 
+    	and delyn is null
+    	ORDER BY path DESC
+    	limit #{pageStart}, #{perPageNum}
+    </select>     
+    
+    <select id="getReplyListCnt" parameterType="com.kbeauty.gbt.entity.view.ContentCondition"  
+                                resultType="java.lang.Integer">
+		SELECT count(*) as cnt FROM CONTENT 
+    	WHERE path LIKE CONCAT(#{path},'%') 
+    	AND depth > 0
+    	and delyn is null
+    </select>     
+    
+    <select id="getAvgReviewGrade" parameterType="com.kbeauty.gbt.entity.view.ContentCondition"  
+                                    resultType="java.lang.Float">
+		SELECT AVG(reviewgrade) FROM CONTENT 
+    	WHERE path LIKE CONCAT(#{path},'%') 
+    	AND depth > 0
+    	AND reviewgrade > 0
+    	and delyn is null
+    </select>     
+    
+    
+    <select id="getContentSeq" resultType="java.lang.Long">
+	    SELECT nextval('CONTENT') as cnt
+    </select>    
+    
+    <select id="getLastOrder" resultType="java.lang.Integer" parameterType="java.lang.String">	    
+	    SELECT COALESCE(MAX(orders), 0) as odr FROM RESOURCES WHERE contentid = #{contentId}
+    </select>
+    
+     
+    
+    <update id="plusViewCount"  parameterType="com.kbeauty.gbt.entity.domain.Count">
+    	update COUNT set viewcnt = viewcnt + 1 where contentid = #{contentId}
+    </update>
+    <update id="minusViewCount"  parameterType="com.kbeauty.gbt.entity.domain.Count">
+    	update COUNT set viewcnt = viewcnt - 1 where contentid = #{contentId}
+    </update>
+    <update id="plusLikeCount"  parameterType="com.kbeauty.gbt.entity.domain.Count">
+    	update COUNT set likecnt = likecnt + 1 where contentid = #{contentId}
+    </update>
+    <update id="minusLikeCount"  parameterType="com.kbeauty.gbt.entity.domain.Count">
+    	update COUNT set likecnt = likecnt - 1 where contentid = #{contentId}
+    </update>
+    <update id="plusFavCount"  parameterType="com.kbeauty.gbt.entity.domain.Count">
+    	update COUNT set favcnt = favcnt + 1 where contentid = #{contentId}
+    </update>
+    <update id="minusFavCount"  parameterType="com.kbeauty.gbt.entity.domain.Count">
+    	update COUNT set favcnt = favcnt - 1 where contentid = #{contentId}
+    </update>
+    <update id="plusReplyCount"  parameterType="com.kbeauty.gbt.entity.domain.Count">
+    	update COUNT set replycnt = replycnt + 1 where contentid = #{contentId}
+    </update>
+    <update id="minusReplyCount"  parameterType="com.kbeauty.gbt.entity.domain.Count">
+    	update COUNT set replycnt = replycnt - 1 where contentid = #{contentId}
+    </update>
+    
+    <select id="getLikeId" resultType="java.lang.String" parameterType="com.kbeauty.gbt.entity.domain.Likes">	    
+	    SELECT likeid FROM LIKES WHERE contentid = #{contentId} and ownerid = #{ownerId} and liketype = #{likeType} and delyn is null  	     	    
+	    <if test='resourceId != null &amp;&amp; !"".equals(resourceId)'>
+    		and resourceid = #{resourceId}
+  		</if>
+    </select>
+
+    <select id="getLikeByUserId" resultMap="likeListResultMap" parameterType="com.kbeauty.gbt.entity.domain.Likes">	    
+	    SELECT * FROM LIKES WHERE contentid = #{contentId} and ownerid = #{ownerId} and liketype = #{likeType} and delyn is null  	     	    
+	    <if test='resourceId != null &amp;&amp; !"".equals(resourceId)'>
+    		and resourceid = #{resourceId}
+  		</if>
+    </select>    
+    
+    <select id="getClassList" resultMap="classListResultMap" parameterType="com.kbeauty.gbt.entity.view.ClassView">    
+	    SELECT  
+			A.classid,	A.classtype, 	A.classname, 	A.level, 	B.middleid, 	B.middlename, C.subid, 	C.subname
+			FROM CLASS01 AS A 
+			INNER JOIN CLASS02 B ON A.classid = B.classid 
+			INNER JOIN CLASS03 C ON B.classid = C.classid AND B.middleid = C.middleid
+		WHERE A.classtype =  #{classType}
+		AND A.status = '0000' 
+		AND B.status = '0000' 
+		AND C.status = '0000' 
+		ORDER BY B.order, C.order 
+    </select>
+    
+    <select id="getClass02Name" resultType="java.lang.String" parameterType="java.lang.String">
+    	SELECT middlename FROM CLASS02 WHERE middleid = #{categoryId}
+    </select>
+    
+    <select id="getClass03Name" resultType="java.lang.String" parameterType="java.lang.String">    	
+		SELECT  subname FROM CLASS03 WHERE subid = #{categoryId}
+    </select>
+    
+    <select id="getClass02Code" resultType="java.lang.String" parameterType="java.lang.String">
+		SELECT middleid FROM CLASS02 WHERE middlename = #{middleName}
+		
+	</select>
+	<select id="getClass03Code" resultType="java.lang.String" parameterType="java.lang.String">
+		SELECT subid FROM CLASS03 WHERE subname = #{subName}
+	</select>   
+	
+    <select id="getPeerProductInfoMap" parameterType="java.util.HashMap" resultMap="peerProductInfoResultMap">        
+        SELECT  
+		A.contentid 
+		,title
+		,maindir
+		,mainfilename
+		,curr
+		,price 
+		,priceurl
+		FROM CONTENT AS A INNER JOIN PRICE AS B ON A.contentid = B.contentid
+		WHERE A.contenttype = '3000' AND B.pricetype = '1000' AND B.delyn IS NULL		
+		<choose>
+            <when test="productIdList.size != 0">
+                AND A.contentid IN
+                <foreach collection="productIdList" item="item" index="index" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </when>
+            <otherwise>
+            	AND 1 = 2
+            </otherwise>            
+        </choose>       
+	 
+    </select>
+ 
+ 	<select id ="checkProductCompare"  parameterType="com.kbeauty.gbt.entity.domain.Content" resultType="com.kbeauty.gbt.entity.domain.Resources">
+ 		 SELECT * FROM RESOURCES WHERE resourcetype = '1040' AND delyn IS NULL AND url = #{contentId}
+ 	</select>
+ 	
+ 	<select id ="searchProductName"  parameterType="java.lang.String" resultType="com.kbeauty.gbt.entity.domain.Content">
+ 		SELECT * FROM CONTENT WHERE title LIKE CONCAT ('%',#{productName},'%') and contenttype ='3000' and delyn IS NULL 
+ 	</select>
+ 	
+ 	<select id ="resourcesFile"  resultType="com.kbeauty.gbt.entity.domain.Resources">
+ 		SELECT * FROM RESOURCES WHERE NOT filename IS NULL
+ 	</select>
+ 	
+ 	<select id ="othersFile"  resultType="com.kbeauty.gbt.entity.domain.Others">
+ 		SELECT * FROM OTHERS WHERE othertype = '3000' and NOT othername IS NULL
+ 	</select>
+ 	
+ 	<select id="getNoticeByNoticeType" parameterType="java.lang.String" resultType="com.kbeauty.gbt.entity.domain.Content">
+		SELECT * FROM CONTENT WHERE contenttype = '9000' and  vendor = #{noticeType} AND active ='9999' AND delyn IS NULL ORDER BY orders ASC, chgdate DESC, chgtime DESC
+ 	</select>
+ 	<select id="getNoticeAll" parameterType="java.lang.String" resultType="com.kbeauty.gbt.entity.domain.Content">
+		SELECT * FROM CONTENT WHERE contenttype = '9000' AND active ='9999' AND delyn IS NULL ORDER BY orders ASC, chgdate DESC, chgtime DESC
+ 	</select>
+ 	
+  
+</mapper>

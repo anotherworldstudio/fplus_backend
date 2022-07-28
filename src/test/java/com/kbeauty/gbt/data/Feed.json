@@ -1,0 +1,40 @@
+{
+	"code": "0000",
+	"msg": "",
+	"content": {
+		"code": null,
+		"msg": null,
+		"regDate": "20201122",
+		"regTime": "17:43:50.254",
+		"regUser": "bec8b2bc98b54fcdbfcbc8588ce3c26a",
+		"chgDate": "20201122",
+		"chgTime": "17:43:50.254",
+		"chgUser": "bec8b2bc98b54fcdbfcbc8588ce3c26a",
+		"delYn": null,
+		"seq": 5,
+		"contentId": "e568cb72137c4501a8998fabd97e560c",
+		"contentType": "1000",
+		"local": null,
+		"ownerId": "bec8b2bc98b54fcdbfcbc8588ce3c26a",
+		"title": null,
+		"content": "ì¢ì ì»¨íí¸ ìëë¤.",
+		"viewType": "9999",
+		"replyYn": "Y",
+		"latitude": null,
+		"longitude": null,
+		"geoName": null,
+		"consumerId": null,
+		"ip": null,
+		"path": "00000000005",
+		"depth": 0,
+		"active": "0000",
+		"status": "0000",
+		"delete": false
+	},
+	"count": null,
+	"like": null,
+	"price": null,
+	"resourceList": [
+	],
+	"hashList": null
+}

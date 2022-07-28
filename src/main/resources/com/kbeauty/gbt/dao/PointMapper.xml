@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.kbeauty.gbt.dao.PointMapper">
+
+	<resultMap id="mileageListMap" type="com.kbeauty.gbt.entity.domain.Mileage">  
+		<result property="seq" column="seq"/>
+		<result property="userId" column="userid"/>
+		<result property="bigType" column="bigtype"/>
+		<result property="mileageType" column="mileagetype"/>
+		<result property="plusMinus" column="plusminus"/>
+		<result property="mile" column="mile"/>
+		<result property="oldTotal" column="oldtotal"/>
+		<result property="newTotal" column="newtotal"/>
+		<result property="userName" column="username"/>
+		<result property="regDate" column="regdate"/>
+		<result property="regTime" column="regtime"/>
+		<result property="regUser" column="reguser"/>
+		<result property="chgDate" column="chgdate"/>
+		<result property="chgTime" column="chgtime"/>
+		<result property="chgUser" column="chguser"/>
+		<result property="delYn" column="delyn"/>
+	</resultMap>
+	
+	<resultMap id="expListMap" type="com.kbeauty.gbt.entity.domain.Exp">  
+		<result property="seq" column="seq"/>
+		<result property="userId" column="userid"/>
+		<result property="bigType" column="bigtype"/>
+		<result property="expType" column="exptype"/>
+		<result property="plusMinus" column="plusminus"/>
+		<result property="exp" column="exp"/>
+		<result property="oldTotal" column="oldtotal"/>
+		<result property="newTotal" column="newtotal"/>
+		<result property="userName" column="username"/>
+		<result property="regDate" column="regdate"/>
+		<result property="regTime" column="regtime"/>
+		<result property="regUser" column="reguser"/>
+		<result property="chgDate" column="chgdate"/>
+		<result property="chgTime" column="chgtime"/>
+		<result property="chgUser" column="chguser"/>
+		<result property="delYn" column="delyn"/>
+	</resultMap>
+	
+	
+	  <select id="getMileageListByUserId" parameterType ="java.lang.String"  resultType="com.kbeauty.gbt.entity.domain.Mileage">
+    	SELECT * FROM MILEAGE WHERE userid = #{userId} and delyn is NULL ORDER BY regdate DESC, regtime DESC, seq DESC;
+ 	  </select>
+ 	  
+	  <select id="getExpListByUserId" parameterType ="java.lang.String"  resultType="com.kbeauty.gbt.entity.domain.Exp">
+    	SELECT * FROM EXP WHERE userid = #{userId} and delyn is NULL ORDER BY regdate DESC, regtime DESC, seq DESC;
+ 	  </select>
+ 	  
+	  <select id="getTotalGetMileage" parameterType ="java.lang.String"  resultType="java.lang.Integer">
+    	SELECT 
+    	CASE WHEN SUM(mile) IS NULL THEN 0 ELSE SUM(mile) END
+ 		FROM MILEAGE WHERE userid = #{userId} and plusminus = 'P' and delyn is null 
+ 	  </select>
+
+	  <select id="getTotalUseMileage" parameterType ="java.lang.String"  resultType="java.lang.Integer">
+    	SELECT 
+    	CASE WHEN SUM(mile) IS NULL THEN 0 ELSE SUM(mile) END 
+    	FROM MILEAGE WHERE userid = #{userId} and plusminus = 'M'  and delyn is null 
+ 	  </select>
+ 	  
+	  <select id="getTotalGetExp" parameterType ="java.lang.String"  resultType="java.lang.Integer">
+    	SELECT 
+    	CASE WHEN SUM(exp) IS NULL THEN 0 ELSE SUM(exp) END
+ 		FROM EXP WHERE userid = #{userId} and plusminus = 'P' and delyn is null 
+ 	  </select>
+
+	  <select id="getTotalUseExp" parameterType ="java.lang.String"  resultType="java.lang.Integer">
+    	SELECT 
+    	CASE WHEN SUM(exp) IS NULL THEN 0 ELSE SUM(exp) END 
+    	FROM EXP WHERE userid = #{userId} and plusminus = 'M'  and delyn is null 
+ 	  </select>
+	
+
+	<select id="getPointTypeList" parameterType="com.kbeauty.gbt.entity.view.PointCondition"  
+                              			  resultType="com.kbeauty.gbt.entity.domain.PointType">
+        SELECT * FROM POINTTYPE WHERE systemtype != '0010' 
+        
+	    <if test='seq>0'>
+        	and seq = #{seq}
+        </if>
+         
+        <if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+  		  		
+	    <if test='bigType != null &amp;&amp; !"".equals(bigType)'>
+    		and bigtype = #{bigType}
+  		</if>
+  		
+	    <if test='systemType != null &amp;&amp; !"".equals(systemType)'>
+    		and systemtype = #{systemType}
+  		</if>
+  		
+ 		 <if test='typeName != null &amp;&amp; !"".equals(typeName)'>
+    		and typename LIKE CONCAT ('%',#{typeName},'%')
+  		</if>
+  		  		
+	    <if test='plusMinus != null &amp;&amp; !"".equals(plusMinus)'>
+    		and plusminus = #{plusMinus}
+  		</if>
+  	
+        order by seq asc
+        
+		limit #{pageStart}, #{perPageNum}
+    </select>
+    
+    
+      <select id="getPointTypeListCnt" parameterType="com.kbeauty.gbt.entity.view.PointCondition"  
+                                resultType="java.lang.Integer">
+        SELECT 
+        CASE WHEN COUNT(*) IS NULL THEN 0
+        ELSE COUNT(*) END cnt
+        FROM POINTTYPE WHERE systemtype != '0010' 
+        
+	   <if test='seq>0'>
+        	and seq = #{seq}
+        </if>
+         
+        <if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+  		  		
+	    <if test='bigType != null &amp;&amp; !"".equals(bigType)'>
+    		and bigtype = #{bigType}
+  		</if>
+  		
+  		 <if test='systemType != null &amp;&amp; !"".equals(systemType)'>
+    		and systemtype = #{systemType}
+  		</if>
+  		  		
+		<if test='typeName != null &amp;&amp; !"".equals(typeName)'>
+   			and typename LIKE CONCAT ('%',#{typeName},'%')
+  		</if>
+  		
+	    <if test='plusMinus != null &amp;&amp; !"".equals(plusMinus)'>
+    		and plusminus = #{plusMinus}
+  		</if>
+  		  		
+        order by  seq asc
+    </select>
+    
+    
+    
+  <select id="getMileageList" parameterType="com.kbeauty.gbt.entity.view.PointCondition"  
+                                resultMap="mileageListMap">
+        
+       	SELECT a.*,b.username FROM(
+        SELECT * FROM MILEAGE WHERE miletype != '0010' 
+        
+	    <if test='seq>0'>
+        	and seq = #{seq}
+        </if>
+         
+	    <if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and userid = #{userId}
+  		</if>
+  		  		
+	    <if test='bigType != null &amp;&amp; !"".equals(bigType)'>
+    		and bigtype = #{bigType}
+  		</if>
+  		
+  		<if test='systemType != null &amp;&amp; !"".equals(systemType)'>
+    		and miletype = #{systemType}
+  		</if>
+  		  		
+	    <if test='plusMinus != null &amp;&amp; !"".equals(plusMinus)'>
+    		and plusminus = #{plusMinus}
+  		</if>
+  	
+  	 	<if test='startDate != null &amp;&amp; !"".equals(startDate)'>
+   			<![CDATA[
+	    		and regdate >= #{startDate}
+       		]]>
+  		</if>
+  		
+  		<if test='endDate != null &amp;&amp; !"".equals(endDate)'>
+   			<![CDATA[
+	    		and regdate <= #{endDate}
+       		]]>
+  		</if>
+  		)a JOIN USER b on a.userid=b.userid  		
+        order by a.seq desc
+        
+		limit #{pageStart}, #{perPageNum}
+    </select>
+    
+    <select id="getMileageListCnt" parameterType="com.kbeauty.gbt.entity.view.PointCondition"  
+                                resultType="java.lang.Integer">
+        SELECT 
+        CASE WHEN COUNT(*) IS NULL THEN 0
+        ELSE COUNT(*) END cnt
+        FROM MILEAGE WHERE miletype != '0010' 
+        
+	    <if test='seq>0'>
+        	and seq = #{seq}
+        </if>
+         
+	    <if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and userid = #{userId}
+  		</if>
+  		  		
+	    <if test='bigType != null &amp;&amp; !"".equals(bigType)'>
+    		and bigtype = #{bigType}
+  		</if>
+  		
+  		<if test='systemType != null &amp;&amp; !"".equals(systemType)'>
+    		and miletype = #{systemType}
+  		</if>
+  		  		
+	    <if test='plusMinus != null &amp;&amp; !"".equals(plusMinus)'>
+    		and plusminus = #{plusMinus}
+  		</if>
+  		
+  	 	<if test='startDate != null &amp;&amp; !"".equals(startDate)'>
+   			<![CDATA[
+	    		and regdate >= #{startDate}
+       		]]>
+  		</if>
+  		
+  		<if test='endDate != null &amp;&amp; !"".equals(endDate)'>
+   			<![CDATA[
+	    		and regdate <= #{endDate}
+       		]]>
+  		</if>
+  		  		
+        order by  seq desc
+    </select>
+    
+    <select id="getExpList" parameterType="com.kbeauty.gbt.entity.view.PointCondition"  
+                                resultMap="expListMap">
+        
+       	SELECT a.*,b.username FROM(
+        SELECT * FROM EXP WHERE exptype != '0010' 
+        
+	    <if test='seq>0'>
+        	and seq = #{seq}
+        </if>
+         
+	    <if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and userid = #{userId}
+  		</if>
+  		  		
+	    <if test='bigType != null &amp;&amp; !"".equals(bigType)'>
+    		and bigtype = #{bigType}
+  		</if>
+  		
+  		<if test='systemType != null &amp;&amp; !"".equals(systemType)'>
+    		and exptype = #{systemType}
+  		</if>
+  		  		
+	    <if test='plusMinus != null &amp;&amp; !"".equals(plusMinus)'>
+    		and plusminus = #{plusMinus}
+  		</if>
+  	
+  	 	<if test='startDate != null &amp;&amp; !"".equals(startDate)'>
+   			<![CDATA[
+	    		and regdate >= #{startDate}
+       		]]>
+  		</if>
+  		
+  		<if test='endDate != null &amp;&amp; !"".equals(endDate)'>
+   			<![CDATA[
+	    		and regdate <= #{endDate}
+       		]]>
+  		</if>
+  		)a JOIN USER b on a.userid=b.userid  		
+        order by a.seq desc
+        
+		limit #{pageStart}, #{perPageNum}
+    </select>
+    
+    <select id="getExpListCnt" parameterType="com.kbeauty.gbt.entity.view.PointCondition"  
+                                resultType="java.lang.Integer">
+        SELECT 
+        CASE WHEN COUNT(*) IS NULL THEN 0
+        ELSE COUNT(*) END cnt
+        FROM EXP WHERE exptype != '0010' 
+        
+	    <if test='seq>0'>
+        	and seq = #{seq}
+        </if>
+         
+	    <if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and userid = #{userId}
+  		</if>
+  		  		
+	    <if test='bigType != null &amp;&amp; !"".equals(bigType)'>
+    		and bigtype = #{bigType}
+  		</if>
+  		
+  		<if test='systemType != null &amp;&amp; !"".equals(systemType)'>
+    		and expType = #{systemType}
+  		</if>
+  		  		
+	    <if test='plusMinus != null &amp;&amp; !"".equals(plusMinus)'>
+    		and plusminus = #{plusMinus}
+  		</if>
+  		
+  	 	<if test='startDate != null &amp;&amp; !"".equals(startDate)'>
+   			<![CDATA[
+	    		and regdate >= #{startDate} 
+       		]]>
+  		</if>
+  		
+  		<if test='endDate != null &amp;&amp; !"".equals(endDate)'>
+   			<![CDATA[
+	    		and regdate <= #{endDate}
+       		]]>
+  		</if>
+  		  		
+        order by  seq desc
+    </select>
+    
+    
+<!--     게임		 -->
+	<select id="getStatusStage1" parameterType="com.kbeauty.gbt.entity.domain.GameData"  
+                                			resultType="java.lang.Integer">
+         SELECT COUNT(*) FROM CONTENT WHERE contenttype = '1000' and ownerid = #{userId} and active ='9999' and regdate > #{clearDate} and depth = 0 and viewtype ='9999' and delyn is null  
+         OR contenttype = '1000' and ownerid = #{userId} and regdate = #{clearDate} and active ='9999' and regtime > #{clearTime} and depth = 0  and viewtype ='9999' and delyn is null 
+                                
+     </select>
+     <select id="getStatusStage2" parameterType="com.kbeauty.gbt.entity.domain.GameData"  
+                                			resultType="java.lang.Integer">
+         SELECT COUNT(*) FROM CONTENT WHERE contenttype = '1000' and ownerid = #{userId} and active ='9999' and regdate > #{clearDate} and depth > 0 and viewtype ='9999' and delyn is null  
+         OR contenttype = '1000' and ownerid = #{userId} and regdate = #{clearDate} and active ='9999' and regtime > #{clearTime} and depth > 0  and viewtype ='9999' and delyn is null 
+                                
+     </select>
+     <select id="getStatusStage3" parameterType="com.kbeauty.gbt.entity.domain.GameData"  
+                                			resultType="java.lang.Integer">
+  			SELECT COUNT(*) FROM 
+		  	(SELECT MAX(seq) FROM SKIN WHERE userid= #{userId} AND regdate > #{clearDate}
+   			OR userid= #{userId} and regdate = #{clearDate} and regtime > #{clearTime}  GROUP BY regdate  ORDER BY MAX(seq) DESC)a
+     </select>
+  		
+  		
+</mapper>

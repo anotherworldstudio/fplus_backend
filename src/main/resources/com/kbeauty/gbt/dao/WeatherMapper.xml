@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.kbeauty.gbt.dao.WeatherMapper">
+
+    <select id="getWeatherProc" parameterType="java.lang.String" resultType="com.kbeauty.gbt.entity.domain.Weather">        
+        SELECT * FROM WEATHER WHERE weathercode = #{weatherCode}       
+    </select>  
+    
+    <select id="getWeatherAndProductList" parameterType="java.lang.String" resultType="com.kbeauty.gbt.entity.domain.Weather">        
+          SELECT a.*,b.refid,b.delyn FROM WEATHER a JOIN (SELECT * FROM WEATHERPRODUCT WHERE delyn IS NULL OR delyn LIKE 'N') b  ON a.weatherid = b.weatherid  WHERE weathercode = #{weatherCode} 
+    </select>  
+    
+	<select id="getWeatherAndPriorityProductList" parameterType="java.lang.String" resultType="com.kbeauty.gbt.entity.domain.Weather">        
+   		 SELECT a.*,b.refid,b.delyn FROM WEATHER a JOIN (SELECT * FROM WEATHERPRODUCT WHERE delyn IS NULL AND priority = 'Y' OR delyn LIKE 'N' AND priority = 'Y') b  ON a.weatherid = b.weatherid  WHERE weathercode = #{weatherCode} 
+    </select>  
+    
+    
+    <insert id="addProductInWeather" parameterType="com.kbeauty.gbt.entity.domain.Weather">
+    INSERT INTO WEATHERPRODUCT (weatherid,refid) VALUES (#{weatherId},(SELECT contentid FROM CONTENT WHERE seq = #{productSeq}))
+    
+    </insert>
+    
+    
+      <select id="getWeatherList" parameterType="com.kbeauty.gbt.entity.view.WeatherCondition"  
+                                resultType="com.kbeauty.gbt.entity.domain.Weather">
+        SELECT * FROM WEATHER WHERE 1=1
+        
+	    <if test='seq>0'>
+        	and seq = #{seq}
+        </if>
+        
+       
+	    <if test='weatherId != null &amp;&amp; !"".equals(weatherId)'>
+    		and weatherid = #{weatherId}
+  		</if>
+  		  		
+	    <if test='weatherType != null &amp;&amp; !"".equals(weatherType)'>
+    		and weathertype = #{weatherType}
+  		</if>
+  		  		
+	    <if test='weatherCode != null &amp;&amp; !"".equals(weatherCode)'>
+    		and weathercode = #{weatherCode}
+  		</if>
+  		  		
+	    <if test='weatherName != null &amp;&amp; !"".equals(weatherName)'>
+    		and weathername = #{weatherName}
+  		</if>
+        
+        
+		limit #{pageStart}, #{perPageNum}
+    </select>
+    
+     <select id="getWeatherListCnt" parameterType="com.kbeauty.gbt.entity.view.WeatherCondition"  
+                               resultType="java.lang.Integer">
+	     SELECT count(*) as cnt  FROM WEATHER WHERE 1=1
+	     
+	    <if test='seq>0'>
+        	and seq = #{seq}
+        </if>
+       
+	    <if test='weatherId != null &amp;&amp; !"".equals(weatherId)'>
+    		and weatherid = #{weatherId}
+  		</if>
+  		  		
+	    <if test='weatherType != null &amp;&amp; !"".equals(weatherType)'>
+    		and weathertype = #{weatherType}
+  		</if>
+  		  		
+  		  		
+	    <if test='weatherCode != null &amp;&amp; !"".equals(weatherCode)'>
+    		and weathercode = #{weatherCode}
+  		</if>
+  		  		
+	    <if test='weatherName != null &amp;&amp; !"".equals(weatherName)'>
+    		and weathername = #{weatherName}
+  		</if>
+        
+  		
+    </select>    
+    
+    
+     <select id="getProductListByWeather" parameterType="com.kbeauty.gbt.entity.domain.Weather"  
+                              resultType="com.kbeauty.gbt.entity.domain.Content">
+                              
+	    SELECT a.*,b.priority FROM CONTENT a JOIN (SELECT refid,priority FROM WEATHERPRODUCT WHERE weatherid = #{weatherId} and delyn is NULL OR delyn LIKE 'N' and weatherid = #{weatherId}) b ON a.contentid=b.refid
+	             
+    </select>  
+    
+     <select id="getPriorityProductList" parameterType="com.kbeauty.gbt.entity.domain.Weather"  
+                              resultType="com.kbeauty.gbt.entity.domain.Content">
+                              
+	    SELECT * FROM CONTENT a JOIN (SELECT refid FROM WEATHERPRODUCT WHERE weatherid = #{weatherId} and delyn is NULL and priority = 'Y'
+		OR delyn LIKE 'N' and weatherid = #{weatherId} and priority = 'Y') b ON a.contentid=b.refid
+	             
+    </select>  
+    
+    
+     <select id="getWeather" parameterType="java.lang.String" resultType="com.kbeauty.gbt.entity.domain.Weather">        
+          SELECT * FROM WEATHER WHERE weatherid = #{weatherId}
+    </select>  
+
+</mapper>

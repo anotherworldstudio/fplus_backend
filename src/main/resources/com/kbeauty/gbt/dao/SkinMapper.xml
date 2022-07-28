@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.kbeauty.gbt.dao.SkinMapper">
+
+	<resultMap id="skinGroupListResultMap" type="com.kbeauty.gbt.entity.domain.SkinGroup">  
+		<result property="seq"       column="seq"/>
+		<result property="groupId"   column="groupid"/>
+		<result property="groupName" column="groupname"/>
+		<result property="active"    column="active"/>
+		<result property="status"    column="status"/>
+		<result property="regDate"   column="regdate"/>
+		<result property="regUser"   column="reguser"/>
+	</resultMap>
+	
+	<select id="getSkinGroupList" parameterType="com.kbeauty.gbt.entity.view.UserSkinCondition"
+                                      resultMap="skinGroupListResultMap">
+	    SELECT  * FROM SKINGROUP
+	    WHERE DELYN IS NULL
+		ORDER BY SEQ DESC
+		limit #{pageStart}, #{perPageNum}
+    </select>
+
+    <select id="getSkinGroupListCnt" parameterType="com.kbeauty.gbt.entity.view.UserSkinCondition"
+                                       resultType="java.lang.Integer">    
+	    SELECT  count(*) as cnt FROM SKINGROUP	     
+		WHERE DELYN IS NULL
+    </select>    	
+	
+	<select id="getMySkinDoctorScore" parameterType="com.kbeauty.gbt.entity.domain.SkinDoctor" resultType="com.kbeauty.gbt.entity.domain.SkinDoctor">
+		SELECT * FROM SKINDOCTOR WHERE doctorid = #{doctorId} and skinid = #{skinId}
+	</select>
+	
+	<resultMap id="aiRecommandListResultMap" type="com.kbeauty.gbt.entity.view.AiRecommandRaw">  
+		<result property="groupId" column="groupid"/>
+		<result property="itemCode" column="itemcode"/>
+		<result property="fromVal" column="fromval"/>
+		<result property="toVal" column="toval"/>
+		<result property="refId" column="refid"/>
+		<result property="contentType" column="contenttype"/>
+		<result property="content" column="content"/>
+		
+		<result property="refGroup" column="refgroup"/>
+		<result property="levelType" column="leveltype"/>
+		<result property="pickCount" column="pickcount"/>
+	</resultMap>
+	
+	
+
+    <select id="getAiRecommandList" resultMap="aiRecommandListResultMap">
+		SELECT  
+			A.groupid,B.itemcode, B.fromval, B.toval, B.leveltype,  B.pickcount, C.refgroup, C.refid, D.contenttype, D.content
+		 FROM SKINGROUP AS A INNER	JOIN SKINLEVEL  AS B ON A.groupid = B.groupid
+		                     INNER	JOIN SKINITEM	AS C ON B.groupid = C.groupid AND B.itemid = C.itemid
+		                     INNER JOIN CONTENT     AS D ON C.refid   = D.contentid		
+		WHERE A.active = '9999' 
+		  AND A.delyn IS NULL
+		  AND D.contenttype IN ('9020','9030','9040','9050')
+    </select>   
+    
+    <select id="getCodeData" parameterType="com.kbeauty.gbt.entity.domain.Code"  
+                                resultType="com.kbeauty.gbt.entity.domain.Code">
+        select * from NCODE where 1 = 1       
+	    
+	    <if test="mCode != null">
+    		and mcode = #{mCode}
+  		</if>
+  	    ORDER BY ncode  
+		limit 1000
+    </select>  
+    
+
+
+    <select id="getMonthSkinData" parameterType="com.kbeauty.gbt.entity.view.UserSkinCondition"  
+                                resultType="com.kbeauty.gbt.entity.view.DiaryView">
+        SELECT regdate as processDate, 
+               COUNT(*) as  processCnt
+        FROM SKIN WHERE userid = #{userId} 
+        and regdate BETWEEN #{startDate}  AND #{endDate}  and delyn is null
+        GROUP BY regdate        
+    </select>    
+    
+    
+    <select id="getDailySkinData" parameterType="com.kbeauty.gbt.entity.view.UserSkinCondition"  
+                                resultType="com.kbeauty.gbt.entity.view.DiaryView">
+    	SELECT skinid as skinId FROM SKIN 
+    	WHERE userid = #{userId} and regdate = #{dDay} 
+    	and delyn is null
+    	ORDER BY seq DESC LIMIT 1
+    </select>
+    
+    <select id="getTermDailySkinData" parameterType="com.kbeauty.gbt.entity.view.UserSkinCondition"  
+                                resultType="com.kbeauty.gbt.entity.domain.Skin">
+       <![CDATA[
+	    	SELECT a.* FROM SKIN
+	    	a JOIN 
+	    	(SELECT MAX(seq) AS seq, regdate FROM SKIN
+	    	WHERE userid=#{userId} and regdate >= #{startDate} and regdate <= #{endDate} AND delyn IS NULL
+	    	GROUP BY regdate ORDER BY regdate)b ON a.seq = b.seq
+        ]]>
+        
+    </select>
+    
+    <select id="getFiveDaySkin" parameterType="java.lang.String" resultType="com.kbeauty.gbt.entity.domain.Skin">
+   		 SELECT b.* FROM (SELECT MAX(seq) AS seq,regdate FROM SKIN WHERE userid=#{userId} AND delyn IS NULL GROUP BY regdate ORDER BY regdate DESC LIMIT 5)a JOIN SKIN b ON a.seq = b.seq 
+    </select>
+    
+    <select id="getUserSkinList" parameterType="com.kbeauty.gbt.entity.view.UserSkinCondition"
+                                resultType="com.kbeauty.gbt.entity.view.UserSkinListView">
+    
+	    SELECT  seq, userid, skinid, groupid, aiurl, dDay, status FROM SKIN 
+		WHERE  1 = 1
+		<if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+	    
+	    <if test="seq != 0">
+	    	and seq = #{seq}
+	    </if>
+		
+		<if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>
+    		and userid = (SELECT userid FROM USER where username =#{searchUserName})
+  		</if>
+  		
+  		<if test='dDay != null &amp;&amp; !"".equals(dDay)'>
+    		and dday = #{dDay}
+  		</if>
+  		
+  		<if test='skinId != null &amp;&amp; !"".equals(skinId)'>
+    		and skinid = #{skinId}
+  		</if>  		
+		 
+		ORDER BY SEQ DESC
+		limit #{pageStart}, #{perPageNum}
+   </select> 
+    <select id="getREQSkinList" parameterType="com.kbeauty.gbt.entity.view.UserSkinCondition"
+                                resultType="com.kbeauty.gbt.entity.view.UserSkinListView">
+ 
+<!--  		<if test='skinStatus.equals("2000")' > -->
+<!-- 					SELECT skinid -->
+<!-- 					FROM (SELECT  c.seq , c.skinid ,d.doctorid -->
+<!-- 					FROM (SELECT a.userid ,a.userrole,b.skinid,b.status,b.seq -->
+<!-- 					FROM (	 -->
+<!--     	</if> -->
+		
+		<if test='skinStatus.equals("0000")' >
+					SELECT c.seq, c.skinid ,c.groupid ,c.aiurl,c.dDay
+					FROM (SELECT a.userid ,a.userrole,b.skinid,b.status,b.seq,b.groupid,b.aiurl, b.dDay
+					FROM ( 
+    	</if>
+		
+	    SELECT  seq, userId, skinid, groupid, aiurl, dDay, status FROM SKIN 
+		WHERE  	
+		
+		<choose>
+			<when test='status != null &amp;&amp; !"".equals(status)'>
+				status = #{status}
+			</when>
+
+			<otherwise>
+				status in ( '1000', '2000', '9000')
+			</otherwise>
+		</choose> 
+		
+		<if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+	    
+	    <if test="seq != 0">
+	    	and seq = #{seq}
+	    </if>
+		
+		<if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>
+    		and USERID = (SELECT userid FROM USER where username =#{searchUserName})
+  		</if>
+  		
+  		<if test='dDay != null &amp;&amp; !"".equals(dDay)'>
+    		and DDAY = #{dDay}
+  		</if>
+  		
+  		<if test='skinId != null &amp;&amp; !"".equals(skinId)'>
+    		and SKINID = #{skinId}
+  		</if>
+		 
+		<if test='skinStatus.equals("0000")'>
+			) b 
+			cross join USER a where a.userrole = '3000' and b.status IN('1000','2000','9000')) c
+			left join SKINDOCTOR d on c.userid = d.doctorid and c.skinid = d.skinid
+			where c.userid = #{doctorId} and d.skinid is null 
+    	</if>
+<!--     	<if test='skinStatus.equals("2000")'> -->
+<!-- 			) b  -->
+<!-- 			cross join USER a where a.userrole = '3000') c -->
+<!-- 			left join SKINDOCTOR d ON c.userid = d.doctorid and  c.skinid = d.skinid -->
+<!-- 			WHERE NOT d.doctorid IS NULL -->
+<!-- 			ORDER BY c.seq DESC) f -->
+<!-- 			GROUP BY skinid -->
+<!-- 			HAVING COUNT(*) >= (SELECT COUNT(*) FROM USER WHERE userrole = '3000') -->
+<!--     	</if> -->
+		
+		ORDER BY SEQ DESC
+		limit #{pageStart}, #{perPageNum}
+		
+   </select> 
+
+    <select id="getUserSkinListCnt" parameterType="com.kbeauty.gbt.entity.view.UserSkinCondition"
+                                       resultType="java.lang.Integer">
+     
+		
+	    SELECT  count(*) as cnt FROM SKIN 
+		WHERE DELYN IS NULL 
+		
+		<if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+	    
+	    <if test="seq != 0">
+	    	and seq = #{seq}
+	    </if>
+		
+		<if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>
+    		and USERID = (SELECT userid FROM USER where username =#{searchUserName})
+  		</if>
+  		
+  		<if test='dDay != null &amp;&amp; !"".equals(dDay)'>
+    		and DDAY = #{dDay}
+  		</if>
+  		
+  		<if test='skinId != null &amp;&amp; !"".equals(skinId)'>
+    		and SKINID = #{skinId}
+  		</if>  			 
+   </select>    
+  <select id="getREQSkinListCnt" parameterType="com.kbeauty.gbt.entity.view.UserSkinCondition"
+                                       resultType="java.lang.Integer">
+    
+    <choose>
+			<when test='skinStatus.equals("0000")'>
+			
+				SELECT COUNT(*) AS cnt FROM(
+				SELECT c.skinid , c.seq ,c.groupid ,c.aiurl,c.dDay
+				FROM (SELECT a.userid ,a.userrole,b.skinid,b.status,b.seq,b.groupid,b.aiurl, b.dDay
+				FROM ( 
+				SELECT  seq, userId, skinid, groupid, aiurl, dDay, status FROM SKIN 
+				WHERE  		
+		<choose>
+			<when test='status != null &amp;&amp; !"".equals(status)'>
+				status = #{status}
+			</when>
+			<otherwise>
+				status in ( '1000', '2000', '9000')
+			</otherwise>
+		</choose> 
+		
+		<if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+	    
+	    <if test="seq != 0">
+	    	and seq = #{seq}
+	    </if>
+		
+		<if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>
+    		and USERID = (SELECT userid FROM USER where username =#{searchUserName})
+
+  		</if>
+  		
+  		<if test='dDay != null &amp;&amp; !"".equals(dDay)'>
+    		and DDAY = #{dDay}
+  		</if>
+  		
+  		<if test='skinId != null &amp;&amp; !"".equals(skinId)'>
+    		0and SKINID = #{skinId}
+  		</if>  		
+		 
+			) b 
+			cross join USER a where a.userrole = '3000' and b.status IN('1000','2000','9000')) c
+			left join SKINDOCTOR d on c.userid = d.doctorid and c.skinid = d.skinid
+			where c.userid = #{doctorId} and d.skinid is null )f
+    	
+			</when>
+
+	<otherwise>
+				
+	    SELECT  count(*) as cnt FROM SKIN 
+		WHERE DELYN IS NULL and 
+		
+		<choose>
+			<when test='status != null &amp;&amp; !"".equals(status)'>
+				status = #{status}
+			</when>
+
+			<otherwise>
+				status in ( '1000', '2000', '9000')
+			</otherwise>
+		</choose>
+		 
+		
+		<if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+	    
+	    <if test="seq != 0">
+	    	and seq = #{seq}
+	    </if>
+		
+		<if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>
+    		and USERID = (SELECT userid FROM USER where username =#{searchUserName})
+  		</if>
+  		
+  		<if test='dDay != null &amp;&amp; !"".equals(dDay)'>
+    		and DDAY = #{dDay}
+  		</if>
+  		
+  		<if test='skinId != null &amp;&amp; !"".equals(skinId)'>
+    		and SKINID = #{skinId}
+  		</if>  			 
+  			</otherwise>
+		</choose>
+  		
+  		
+   </select>  
+   
+    
+   <select id="getSkinRank" parameterType="com.kbeauty.gbt.entity.view.SkinRank"
+                              resultType="com.kbeauty.gbt.entity.view.SkinRank">
+    
+	   SELECT skinid, score,  ranking,  cnt FROM (
+		  SELECT *, rank() over(order by score desc) AS ranking , COUNT(*) over () AS cnt 
+		  FROM (
+		      SELECT B.skinid, SUM(adjustscore) AS score 
+		        FROM USER AS A 
+		       INNER JOIN SKIN AS B ON A.userid = B.userid 
+		       INNER JOIN SKINSCORE AS C ON B.skinid = C.skinid
+		       WHERE A.delyn IS NULL 
+		         AND	A.userid != '75d84aace2514989b6a2825246db7cc5'
+		         AND A.birthday BETWEEN #{startDate} AND #{endDate} 
+		       GROUP BY B.skinid 
+		      ) AA
+		  ) BB 
+		
+		<![CDATA[
+		WHERE score <=  
+        ]]>
+        
+        #{inputScore}
+        
+        LIMIT 1
+        
+   </select> 
+   
+   <select id="getSkinAge01" parameterType="com.kbeauty.gbt.entity.view.SkinRank"
+                                resultType="com.kbeauty.gbt.entity.view.SkinRank">
+    
+		SELECT skinid, score,  ranking,  cnt FROM (
+			SELECT 
+				skinid, score, rank() over(order by score desc) AS ranking , COUNT(*) over () AS cnt 
+			FROM 
+			(
+				SELECT  
+					skinid, 
+					SUM((
+					case itemcode 
+					when '10000' then adjustscore * 6  
+					when '10010' then adjustscore * 2   
+					when '10020' then adjustscore * 1   
+					when '10030' then adjustscore * 4  
+					when '10040' then adjustscore * 2  
+					END                
+					) 
+					)
+					AS score 
+				FROM SKINSCORE 
+				GROUP BY skinid 
+			) AA 
+		) BB		 
+		
+		<![CDATA[
+		WHERE score <=  
+        ]]>
+        
+        #{inputScore} 
+		 
+		 LIMIT 1        
+   </select>
+
+   <select id="getSkinAge02" parameterType="com.kbeauty.gbt.entity.view.SkinRank"
+                                resultType="com.kbeauty.gbt.entity.view.SkinRank">
+    
+		SELECT skinid, score,  ranking,  cnt FROM (
+			SELECT 
+				skinid, score, rank() over(order by score desc) AS ranking , COUNT(*) over () AS cnt 
+			FROM 
+			(
+				SELECT  
+					skinid, 
+					SUM((
+					case itemcode 
+					when '10000' then adjustscore * 8  
+					when '10010' then adjustscore * 2   
+					when '10020' then adjustscore * -1   
+					when '10030' then adjustscore * 4  
+					when '10040' then adjustscore * 2  
+					END                
+					) 
+					)
+					AS score 
+				FROM SKINSCORE 
+				GROUP BY skinid 
+			) AA 
+		) BB		 
+		
+		<![CDATA[
+		WHERE score <=  
+        ]]>
+
+	#{inputScore}
+
+	LIMIT 1        
+   </select>
+
+	<select id="getSkinAge" parameterType="java.lang.Integer"
+		resultType="java.lang.Integer">                                       
+   		<![CDATA[
+   		SELECT COALESCE(age, 0) as age FROM SKINAGE WHERE fromval <= #{score} AND toval >= #{score}    
+   		]]>
+	</select>
+
+	<update id="updateStatusBySkinId"
+		parameterType="java.lang.String">
+		UPDATE SKIN set status = 1000 where skinid= #{skinId}
+
+	</update>
+
+	<select id="getAVGScore" parameterType="java.lang.String" resultType="com.kbeauty.gbt.entity.domain.SkinDoctor">
+
+		SELECT TRUNCATE(AVG(forehead),0) AS forehead,TRUNCATE(AVG(middle),0) AS middle,
+		TRUNCATE(AVG(wrinkle),0) AS wrinkle, TRUNCATE(AVG(eye),0) AS eye,
+		TRUNCATE(AVG(mouth),0) AS mouth ,TRUNCATE(AVG(topzone),0) AS topzone,
+		TRUNCATE(AVG(bottomzone),0) AS bottomzone,TRUNCATE(AVG(rightzone),0) AS rightzone,
+		TRUNCATE(AVG(leftzone),0) AS leftzone ,TRUNCATE(AVG(trouble),0) AS trouble,
+		TRUNCATE(AVG(pigment),0) AS pigment, TRUNCATE(AVG(redness),0) AS redness FROM SKINDOCTOR WHERE skinid = #{skinId}
+		
+   </select>
+  
+  	<select id="getSkinRankingTop10" parameterType="com.kbeauty.gbt.entity.view.SkinRankingView"
+ 									resultType="com.kbeauty.gbt.entity.domain.SkinRanking">
+	 	SELECT a.*,b.username FROM (								
+	 	SELECT * FROM SKINRANKING WHERE chgdate = #{day}
+	 	
+	 	<if test='sex != null &amp;&amp; !"".equals(sex)'>
+	 		and sex = #{sex}
+	   	</if>
+	   	
+	   	<if test="age!=0">
+	   		and age &gt;= FLOOR(#{age}/10)*10 and age &lt; FLOOR(#{age}/10)*10+10 
+	   	</if>
+	   	)a JOIN USER b ON a.userid = b.userid 
+	 	ORDER BY a.score desc limit 10
+	 	
+	  </select>
+  
+  	<select id="getFinishTestList" parameterType="java.lang.String"  
+                                resultType="com.kbeauty.gbt.entity.domain.SkinTypeTest">
+       	SELECT * FROM SKINTYPETEST WHERE userid= #{userId} and status = '2000' and delyn is null      
+  	</select> 
+      
+  	<select id="getProgressTestList" parameterType="java.lang.String"  
+                                resultType="com.kbeauty.gbt.entity.domain.SkinTypeTest">
+       	SELECT * FROM SKINTYPETEST WHERE userid= #{userId} and status = '1000' and delyn is null      
+  	</select>  
+  	
+  
+   	<select id="findByTestId" parameterType="java.lang.String"  
+                                resultType="com.kbeauty.gbt.entity.domain.SkinTypeTestStep">
+       	SELECT * FROM SKINTYPETESTSTEP WHERE testid= #{testId}      
+  	</select>  
+  	
+  		<select id="findByTestIdAndStep" parameterType="com.kbeauty.gbt.entity.domain.SkinTypeTestStep"  
+                                resultType="com.kbeauty.gbt.entity.domain.SkinTypeTestStep">
+       	SELECT * FROM SKINTYPETESTSTEP WHERE testid= #{testId} and step = #{step}  
+  	</select>  
+  	
+  	
+  	
+  	<select id="getSkinTestMaxStep" parameterType="java.lang.String"  
+                                resultType="java.lang.Integer">
+		SELECT
+		CASE WHEN MAX(step) IS NULL THEN 0 ELSE MAX(step) END as step
+		FROM SKINTYPETESTSTEP WHERE testid = #{testId}
+  	</select>
+  
+  	<select id="getSkinTypeTestScore" parameterType="com.kbeauty.gbt.entity.domain.SkinTypeTest"
+   											resultType="com.kbeauty.gbt.entity.view.SkinTypeView">
+	   	SELECT testid,
+			SUM(CASE WHEN type = '0000' THEN score END) AS odscore,
+			SUM(CASE WHEN type = '1000' THEN score  END) AS srscore,
+			SUM(CASE WHEN type = '2000' THEN score  END) AS pnscore,
+			SUM(CASE WHEN type = '3000' THEN score END) AS wtscore,
+			SUM(score) AS score
+		FROM SKINTYPETESTSTEP WHERE testid = #{testId} GROUP BY testid					
+   											
+  	</select>
+
+  
+</mapper>

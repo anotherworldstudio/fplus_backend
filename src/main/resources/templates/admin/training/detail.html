@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lagn="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layout/default">
+<th:block layout:fragment="content">	
+
+<!-- Javascript functions	-->
+<script type="text/javascript">
+    
+	document.addEventListener("DOMContentLoaded", function(){ 
+		
+		if(training.status=='2000'){
+	 	$("#grade").val(training.grade);
+	 	if(training.editFacialContour!=""){
+	 		$("#editFacialContour").val(training.editFacialContour);
+	 	}
+	 	if(training.editSeasonColor!=""){
+	 		$("#editSeasonColor").val(training.editSeasonColor);
+	 	}  
+	 	if(training.editSkinTone!=""){
+	 		$("#editSkinTone").val(training.editSkinTone);
+	 	}  
+    	}
+    	 
+    	      
+	});  
+	
+	
+// 평가히스토리 팝업 생성
+function showEvaluatePopup(trainingId){
+	
+	var width=700, height=800;
+	var left = (screen.availWidth - width)/2;
+	var top = (screen.availHeight - height)/2;
+	var specs = "toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=no, copyhistory=no";
+	specs += ",width=" + width;
+	specs += ",height=" + height;
+	specs += ",left=" + left;
+	specs += ",top=" + top;
+	
+	var popupWin = window.open('/w1/training/go_evaluate_popup?reset=Y&trainingId='+trainingId+'', '평가기록', specs);	
+	return popupWin;
+}
+function createEvaluatePopup(trainingId){	
+	var popupWin = showEvaluatePopup(trainingId);
+}
+	 
+</script>
+
+
+<script th:inline="javascript">
+	var training = null;
+	
+/*<![CDATA[*/
+    training = /*[[${trainingView.training}]]*/ "";
+    //console.log(content);
+/*]]>*/
+ 
+ 
+ 
+	function deleteTraining(){
+		showConfirm("삭제 하시겠습니까?", function(){
+			form1.action = "/w1/training/delete_training";
+			form1.submit();
+		});
+	}
+	function gradeTraining(){
+		showConfirm("평가 하시겠습니까?", function(){
+			form1.action = "/w1/training/grade_training";
+			form1.submit();
+		});
+	}
+	
+	function goList(){
+		location.href="/w1/training/go_list";		
+	}
+	
+	function updateStatus(){
+	
+	if ( confirm("넘기시겠습니까?") == true){   
+                    	
+	//var skinId = 'df'; 
+		$.ajax({	
+		        url : "/w1/skin/update_status_wait",
+		        data : skinId,
+		        type : 'post',
+		        contentType:"application/json; charset=UTF-8", 
+		        success : function(data){
+		         	console.log(data);
+		         	$(".send_doctor").remove();
+		        },
+		        error : function(e){
+		        	console.log(e);
+		        }
+	   		});
+		}else{   
+	       return;
+	     }
+	}
+
+</script>
+
+	<div class="">
+		<div class="row">		
+		
+			<div class="col-md-12 col-sm-12">
+				<div class="x_panel">
+					
+					<div class="x_title">
+						<h2>
+							사용자 실습 상세
+						</h2>
+						<ul class="nav navbar-right panel_toolbox">
+							<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>							
+							<li><a class="close-link"><i class="fa fa-close"></i></a></li>
+						</ul>
+						<div class="clearfix"></div>
+					</div>
+					
+					<div class="x_content">
+						
+						<form class="form-horizontal form-label-left" th:object=${trainingView.training} th:action="@{/w1/training/save}" method="post" id="form1" name="form1" novalidate>
+							<input type="hidden" name="seq" id="seq" th:value="*{seq}" />
+							<input type="hidden" name="trainingId" id="trainingId" th:value="*{trainingId}" />																				
+							<input type="hidden" name="userId" id="userId" th:value="*{userId}" />
+							
+							
+							<span class="section">사용자 메이크업 실습 정보 : <span th:text="*{seq}"></span></span>
+
+						    <div class="form-group row align-items-center" style="JUSTIFY-CONTENT: CENTER;">								
+								<div class="col-md-5 col-sm-5 " style="text-align: center;">
+									<img src="./images/tree.jpg" 
+										th:attr="src=*{beforeImg}"
+										style = "width:350px"	
+										class="img-responsive img-rounded">
+								</div>
+								<div class="col-md-5 col-sm-5 " style="text-align: center;">
+									<img src="./images/tree.jpg" 
+										style = "width:350px"	
+										th:attr="src=*{afterImg}"									
+										class="img-responsive img-rounded">
+								</div>
+							</div>
+							
+							<div class="form-group row align-items-center">
+								<label class="control-label col-md-2 col-sm-2 ">사용자명</label>
+								<div class="col-md-4 col-sm-4 ">
+									<span type="text" class="form-control" placeholder="" name="userName" id="userName" th:text="${trainingView.user.userName}" />
+								</div>
+							</div>
+							
+							<div class="form-group row align-items-center">
+								<label class="control-label col-md-2 col-sm-2 ">최초등록일자</label>
+								<div class="col-md-4 col-sm-4 ">
+									<span type="text" class="form-control" placeholder="" name="regDate" id="regDate" th:text="*{regDate}" />
+								</div>
+								<label class="control-label col-md-2 col-sm-2 ">2차등록일자</label>
+								<div class="col-md-4 col-sm-4 ">
+									<span type="text" class="form-control" placeholder="" name="finishDate" id="finishDate" th:text="*{finishDate}" >
+								</div>
+							</div>
+							
+							<div class="form-group row align-items-center">								
+								<label class="control-label col-md-2 col-sm-2 ">상태</label>
+								<div class="col-md-4 col-sm-4 ">
+									<span type="text" class="form-control" placeholder="" name="status" id="status" th:text="*{statusName}" >
+								</div>								
+							</div>
+							
+							<div class="form-group row align-items-center">
+								<label class="control-label col-md-1 col-sm-1 ">타입</label>
+								
+								<label class="control-label col-md-1 col-sm-1 ">스킨톤</label>
+								<div class="col-md-2 col-sm-2 ">
+									<span type="text" class="form-control"  name="skinTone" id="skinTone" th:text= "*{skinToneName}"/>
+								</div>
+								<label class="control-label col-md-1 col-sm-1 ">시즌컬러</label>
+								<div class="col-md-2 col-sm-2 ">
+									<span type="text" class="form-control"  name="seasonColor" id="seasonColor" th:text= "*{seasonColorName}"/>
+								</div>
+								
+								<label class="control-label col-md-1 col-sm-1 ">얼굴윤곽</label>
+								<div class="col-md-2 col-sm-2 ">
+									<span type="text" class="form-control"  name="facialContour" id="facialContour" th:text= "*{facialContourName}"/>
+								</div>
+							</div>
+							
+							<div class="form-group row align-items-center">
+								<label class="control-label col-md-1 col-sm-1 "></label>
+								
+								<label class="control-label col-md-1 col-sm-1 ">나이대</label>
+								<div class="col-md-2 col-sm-2 ">
+									<span type="text" class="form-control"  name="age" id="age" th:text= "*{ageName}"/>
+								</div>
+								<label class="control-label col-md-1 col-sm-1 ">성별</label>
+								<div class="col-md-2 col-sm-2 ">
+									<span type="text" class="form-control"  name="gender" id="gender" th:text= "*{genderName}"/>
+								</div>
+								
+							</div>
+							<br>
+							
+							<div th:if="${!session.userRole.equals('4000')}">
+								<div class="form-group row align-items-center" th:if="*{status.equals('2000')}">
+									<label class="control-label col-md-1 col-sm-1 ">평가</label>
+									
+									<label class="control-label col-md-1 col-sm-1 ">점수</label>
+									<div class="col-md-2 col-sm-2 ">
+										<span  class="form-control"  name="score2" id="scorea2" th:text="*{score}"/>
+									</div>
+									
+									<label class="control-label col-md-1 col-sm-1 ">등급</label>
+									<div class="col-md-2 col-sm-2 ">
+										<span type="text" class="form-control"  name="gradeName" id="gradeName" th:text="*{gradeName}"/>
+									</div>
+								</div>
+							</div>	
+							
+							<div th:if="${!session.userRole.equals('4000')}">
+							<div class="form-group row align-items-center" th:if="*{status.equals('2000')}">
+								<label class="control-label col-md-1 col-sm-1 ">얼굴타입수정</label>
+								<label class="control-label col-md-1 col-sm-1 ">스킨톤</label>
+								<div class="col-md-2 col-sm-2 ">
+									<span class="form-control"  name="editSkinToneName" id="editSkinToneName" th:text="*{editSkinToneName}"/>
+								</div>
+								
+								<label class="control-label col-md-1 col-sm-1 ">시즌컬러</label>
+								<div class="col-md-2 col-sm-2 ">
+									<span class="form-control"  name="editSeasonColorName" id="editSeasonColorName" th:text="*{editSeasonColorName}"/>
+								</div>
+								<label class="control-label col-md-1 col-sm-1 ">얼굴윤곽</label>
+								<div class="col-md-2 col-sm-2 ">
+									<span class="form-control"  name="editFacialContourName" id="editFacialContourName" th:text="*{editFacialContourName}"/>
+								</div>
+							</div>
+							</div>
+								
+							<div th:if="${!session.userRole.equals('4000')}">
+							<div class="form-group row align-items-center" th:if="*{status.equals('2000')}">
+								<label class="control-label col-md-2 col-sm-2 ">코멘트
+								</label>
+								<div class="col-md-10 col-sm-10 ">								
+									<textarea class="form-control" required="required" rows="3" placeholder="" name="commentSea" id="commentSea" th:text="${trainingView.training.comment}"></textarea>									
+								</div>
+							</div>
+							</div>
+							
+							
+							
+							<div th:if="${session.userRole.equals('4000')}">
+							
+							<div class="x_title" style="margin-top:100px; margin-bottom:30px;">
+								<h2>
+									평가 등록/수정
+								</h2>
+								<ul class="nav navbar-right panel_toolbox">
+									<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>							
+									<li><a class="close-link"><i class="fa fa-close"></i></a></li>
+								</ul>
+								<div class="clearfix"></div>
+							</div>
+					
+							<div class="form-group row align-items-center">
+								<label class="control-label col-md-1 col-sm-1 ">얼굴타입수정</label>
+								<label class="control-label col-md-1 col-sm-1 ">스킨톤</label>
+								<div class="col-md-2 col-sm-2 ">
+									<select required class="form-control" name="editSkinTone" id="editSkinTone">
+							    		<option th:each="skinTone : ${T(com.kbeauty.gbt.entity.enums.SkinTone).values()}" 
+						        			th:value="${skinTone.code}" th:text="${skinTone.val}"></option>
+									</select>
+								</div>
+								
+								<label class="control-label col-md-1 col-sm-1 ">시즌컬러</label>
+								<div class="col-md-2 col-sm-2 ">
+									<select required class="form-control" name="editSeasonColor" id="editSeasonColor">
+							    		<option th:each="seasonColor : ${T(com.kbeauty.gbt.entity.enums.SeasonColor).values()}" 
+						        			th:value="${seasonColor.code}" th:text="${seasonColor.val}"></option>
+									</select>
+								</div>
+								<label class="control-label col-md-1 col-sm-1 ">얼굴윤곽</label>
+								<div class="col-md-2 col-sm-2 ">
+									<select required class="form-control" name="editFacialContour" id="editFacialContour">
+							    		<option th:each="facialContour : ${T(com.kbeauty.gbt.entity.enums.FacialContour).values()}" 
+						        			th:value="${facialContour.code}" th:text="${facialContour.val}"></option>
+									</select>
+								</div>
+							</div>
+							
+							<div class="form-group row align-items-center">
+								<label class="control-label col-md-1 col-sm-1 ">평가</label>
+								<label class="control-label col-md-1 col-sm-1 ">점수</label>
+								<div class="col-md-2 col-sm-2 ">
+									<input type="number" class="form-control"  name="score" id="score" th:value="${trainingView.training.score}" />
+								</div>
+								
+								<label class="control-label col-md-1 col-sm-1 ">등급</label>
+								<div class="col-md-2 col-sm-2 ">
+									<select required class="form-control" name="grade" id="grade">
+							    		<option th:each="grade : ${T(com.kbeauty.gbt.entity.enums.Grade).values()}" 
+						        			th:value="${grade.code}" th:text="${grade.val}"></option>
+									</select>
+		
+		
+								</div>
+								
+							</div>
+			
+							<div class="form-group row align-items-center">
+								<label class="control-label col-md-2 col-sm-2 ">코멘트
+								</label>
+								<div class="col-md-10 col-sm-10 ">								
+									<textarea class="form-control" required="required" rows="3" placeholder="" name="comment" id="comment" th:text="${trainingView.training.comment}"></textarea>									
+								</div>
+							</div>
+							
+					
+							</div>
+							<div class="control-group row 	">								
+								<div class="col-md-12 col-sm-12  justify-content-end" style="display: flex;">
+		                  			<a class="btn btn-app" th:if="${session.userRole.equals('4000')}"  onClick="gradeTraining()" >		                    			
+		                    			<i class="fa fa-edit">평가</i>
+		                  			</a>
+		                  			<a class="btn btn-app"  onClick="goList()">		                    			
+		                    			<i class="fa fa-list"></i> List
+		                  			</a>
+		                  			<a class="btn btn-app" th:if="${session.userRole.equals('0000')}" onClick="deleteTraining()">		                    			
+		                    			<i class="fa fa-remove"></i> Delete
+		                  			</a>
+								</div>	
+							</div>
+							
+							</form>							
+													
+					</div>
+					
+				</div>
+			</div>
+			
+				<!-- -----------------  -->
+		</div>
+	</div>
+	
+	
+ 
+</th:block>
+
+    
+</html>

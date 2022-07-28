@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lagn="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/share">
+
+<th:block layout:fragment="content">	
+<script>
+	
+	var appSchem   = 'labellelabbj://dplinkaisikin';
+	var marketAddr = 'https://play.google.com/store/apps/details?id=com.beautyjourney.beautageapp.android';
+
+	function goApp(){
+		var device = checkDevice();
+		if(device!="pc"){
+			if(device == "ios"){
+				alert("iOS App은 개발중입니다.");
+				return;
+			}else{
+				isMyApp();		
+				location.href = appSchem;		
+			}
+		}		
+	}
+	
+	function isMyApp(){
+		function clearTimers(){
+	        clearInterval(heartbeat);
+	        clearTimeout(timer);
+	    }
+
+	    function intervalHeartbeat(){
+	        if(document.webkitHidden || document.hidden){
+	            clearTimers();
+	            //console.log('앱이 설치 되어 있습니다.');
+	        }
+	    }
+	    
+	    heartbeat = setInterval(intervalHeartbeat, 200);
+	    var deLay = 1000;
+	    timer = setTimeout(function() {
+	        //console.log('앱이 없습니다.');
+			location.href = marketAddr;
+	    }, deLay);
+	  }
+	
+	function checkDevice(){
+		var os;
+		var mobile = (/iphone|ipad|ipod|android/i.test(navigator.userAgent.toLowerCase()));	 
+		if (mobile) {
+			var userAgent = navigator.userAgent.toLowerCase();
+			if (userAgent.search("android") > -1){
+				return os = "android";
+			}else if ((userAgent.search("iphone") > -1) || (userAgent.search("ipod") > -1) || (userAgent.search("ipad") > -1)){
+				return os = "ios";
+			}else{
+				return os = "otehr";
+			}
+		} else {
+			return os = "pc";
+		}
+	}
+
+
+	
+</script>
+  <form class="form-horizontal form-label-left" th:object=${skinShareView} method="post" id="form1" name="form1" novalidate>
+	<div style="width:100%;padding: 10px;" >
+		<div>
+			<div style="background:#ffffff;height:60px;line-height:60px;text-align: center;">				
+				<div style="background:#ffffff;height:40px;display: inline-block;vertical-align: middle;">
+				<h2 style="font-size: 18px;color: #292726;" ><b th:text="*{title}">2021.02.25 AI 피부분석결과</b>
+					
+				</h2>
+				</div>
+			</div>
+		</div>
+		
+		<div style="width:auto;height: 100px;display: flex;flex-direction: column;justify-content: space-around;">
+			
+			<div style="width:auto;height: 100px;display: flex;flex-direction: row;justify-content: flex-start;padding: 6px;">
+				
+				<div style="width:100px;height:auto;display: flex;flex-direction: column;justify-content: space-around;">					
+					<img style="width: 74px; height: 74px;object-fit: cover;object-position: top;border-radius: 50%;"  
+					class='photo0' 
+					th:attr="src=*{aiUrl}"
+					src="/images/share_img.png" />					
+				</div>	
+			
+<!-- 				<div style="width:100px;height:auto;display: flex;flex-direction: column;justify-content: space-around;">					 -->
+<!-- 						<img src="/images/share_img.png" style="width: 72px;height:71px;">					 -->
+<!-- 				</div>	 -->
+				
+				
+				<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: space-evenly;padding-left: 4px;">
+					<div style="font-size: 16px;color: #292726;"><b th:text="*{userName}">누구누구</b><b> 님,</b></div>
+					<div style="font-size: 12px;color: #878787;" th:text="*{lowerPer}">또래 사용자 80%보다 피부가 좋아요</div>
+					<div style="font-size: 12px;color: #878787;">
+					<b style="font-size: 12px;color: #292726;">총점</b>
+					<b style="font-size: 12px;color: #292726;" th:text="*{totalScore}">80</b>/100점
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <span class="section"></span>
+        
+		<div style="width:auto;height: 60px;display: flex;flex-direction: column;justify-content: space-around;">
+			
+			<div style="width:auto;height: 60px;display: flex;flex-direction: row;justify-content: flex-start;">
+			
+				<div style="width:140px;height:auto;display: flex;flex-direction: column;justify-content: flex-start;">
+					<div style="font-size: 12px;color: #878787;">
+						MY SKIN
+					</div>					
+				</div>	
+				
+				<div style="width:70%;height:auto;display: flex;flex-direction: column;justify-content: flex-start;">				
+					<div style="width:auto;height:auto;display: flex;flex-direction: row;justify-content: space-around;">
+						<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: space-around;">							
+							<div style="font-size: 16px;color: #292726;margin-bottom: 6px;text-align: center;">
+								<b th:text="*{skinAge}">24</b><b>세</b>							
+							</div>
+							
+							<div style="font-size: 12px;color: #878787;text-align: center;">피부나이</div>
+						</div> 	
+						<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: space-around;">							
+							<div style="font-size: 16px;color: #292726;margin-bottom: 6px;text-align: center;"><b>상위 </b><b th:text="*{upperPer}">20</b><b>%</b></div>							
+							<div style="font-size: 12px;color: #878787;text-align: center;">랭킹</div>
+						</div>
+					</div>
+				</div>	
+			</div>
+		</div>
+		
+		<span class="section"></span>
+		
+		<div>
+			<div style="text-align: left;">
+				<h2>
+					<b style="font-size: 15px;color: #292726;">SKIN SCORE</b>
+				</h2>
+			</div>
+			<div style="font-size: 12px;color: #878787;text-align: left;margin-bottom: 15px;" th:text="*{comment}">
+			전반적으로 당신의 피부는 양호한 상태! 하지만 피쿠케어에 늘 관심을 가지고 꾸준히 케어를 해 주시면 좋아요.
+			</div>
+		</div>
+		
+	   <!-- 메인   -->	
+       <div style="width:100%;height:auto;display: flex;flex-direction: column;justify-content: flex-start;"> 
+       	  
+       	  <!-- 큰줄 1  -->
+       	  <div style="width:100%;height:56px;display: flex;flex-direction: row;justify-content: space-between;margin-bottom: 7px;">  
+       	  	<!-- 아이템 left -->
+       	  	<div style="width:49%;height:auto;display: flex;flex-direction: row;justify-content: flex-start;background: white;padding: 8px;">        	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;margin-right: 15px;"> <!-- 이미지 coloum -->
+       	  			<div><img src="/images/ic_wrinkle.png" style="width: 16px;height:16px;">
+       	  			</div>
+       	  			<div></div>
+       	  		</div>
+       	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;"> <!-- 점수 coloum -->
+       	  			<div><b style="font-size: 12px;color: #292726;">주름</b></div>
+       	  			
+       	  			<div style="font-size: 16px;color: #292726;"><b th:text="*{wrinkle}">80</b><b>점</b></div>
+       	  		</div>
+       	  	</div>
+       	  	
+       	  	<!-- 아이템 right -->
+       	  	<div style="width:49%;height:auto;display: flex;flex-direction: row;justify-content: flex-start;background: white;padding: 8px;">        	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;margin-right: 15px;"> <!-- 이미지 coloum -->
+       	  			<div><img src="/images/ic_pigment.png" style="width: 16px;height:16px;">
+       	  			</div>
+       	  			<div></div>
+       	  		</div>
+       	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;"> <!-- 점수 coloum -->       	  			
+       	  			<div><b style="font-size: 12px;color: #292726;">색소침착</b></div>       	  			
+       	  			<div style="font-size: 16px;color: #292726;"><b th:text="*{pigment}">80</b><b>점</b></div>
+       	  		</div>
+       	  	</div>
+
+
+       	  </div> <!-- 큰줄1 end  -->
+       	  
+       	  <!-- 큰줄 2  -->
+       	  <div style="width:100%;height:56px;display: flex;flex-direction: row;justify-content: space-between;margin-bottom: 7px;">  
+       	  	<!-- 아이템 left -->
+       	  	<div style="width:49%;height:auto;display: flex;flex-direction: row;justify-content: flex-start;background: white;padding: 8px;">        	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;margin-right: 15px;"> <!-- 이미지 coloum -->
+       	  			<div><img src="/images/ic_trouble.png" style="width: 16px;height:16px;">
+       	  			</div>
+       	  			<div></div>
+       	  		</div>
+       	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;"> <!-- 점수 coloum -->       	  			
+       	  			<div><b style="font-size: 12px;color: #292726;">트러블</b></div>       	  			
+       	  			<div style="font-size: 16px;color: #292726;"><b th:text="*{trouble}">80</b><b>점</b></div>
+       	  		</div>
+       	  	</div>
+       	  	
+       	  	<!-- 아이템 right -->
+       	  	<div style="width:49%;height:auto;display: flex;flex-direction: row;justify-content: flex-start;background: white;padding: 8px;">        	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;margin-right: 15px;"> <!-- 이미지 coloum -->
+       	  			<div><img src="/images/ic_pore.png" style="width: 16px;height:16px;">
+       	  			</div>
+       	  			<div></div>
+       	  		</div>
+       	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;"> <!-- 점수 coloum -->       	  			
+       	  			<div><b style="font-size: 12px;color: #292726;">모공</b></div>       	  			
+       	  			<div style="font-size: 16px;color: #292726;"><b th:text="*{pore}">80</b><b>점</b></div>
+       	  		</div>
+       	  	</div>
+
+
+       	  </div> <!-- 큰줄2 end  -->
+
+       	  <!-- 큰줄 3  -->
+       	  <div style="width:100%;height:56px;display: flex;flex-direction: row;justify-content: space-between;margin-bottom: 7px;">  
+       	  	<!-- 아이템 left -->
+       	  	<div style="width:49%;height:auto;display: flex;flex-direction: row;justify-content: flex-start;background: white;padding: 8px;">        	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;margin-right: 15px;"> <!-- 이미지 coloum -->
+       	  			<div><img src="/images/ic_redness.png" style="width: 16px;height:16px;">
+       	  			</div>
+       	  			<div></div>
+       	  		</div>
+       	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;"> <!-- 점수 coloum -->       	  			
+       	  			<div><b style="font-size: 12px;color: #292726;">홍조</b></div>
+       	  			<div style="font-size: 16px;color: #292726;"><b th:text="*{redness}">80</b><b>점</b></div>
+       	  		</div>
+       	  	</div>
+       	  	
+       	  	<!-- 아이템 right -->
+       	  	<div style="width:49%;height:auto;display: flex;flex-direction: row;justify-content: flex-start;padding: 8px;">        	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;margin-right: 15px;"> <!-- 이미지 coloum -->
+       	  			<div></div>
+       	  			<div></div>
+       	  		</div>
+       	  		
+       	  		<div style="width:auto;height:auto;display: flex;flex-direction: column;justify-content: flex-start;"> <!-- 점수 coloum -->
+       	  			<div style="font-size: 12px;color: #292726;"></div>
+       	  			<div><b style="font-size: 16px;color: #292726;"></b></div>
+       	  		</div>
+       	  	</div>
+
+
+       	  </div> <!-- 큰줄 3 end  -->
+       	  
+       </div> <!-- 메인 end  -->
+     </div>
+     
+     <div style="width:100%;height:20px;display: flex;flex-direction: row;justify-content: space-between;">
+     </div>
+     
+     <!-- 피부 분석 버튼  -->
+     <div style="width:100%;height:auto;display: flex;flex-direction: row;justify-content: flex-start;padding-left: 10px;padding-right: 10px;">
+     	<div style="width:100%;height:auto;display: flex;flex-direction: row;justify-content: center;padding: 15px;background: #FF8C6B;" onClick="goApp()">
+     		<p style="font-size: 14px;color: #ffffff;margin: 0;">피부분석 하러 가기</p>
+     	</div>
+     </div>
+  </form>     
+        
+</th:block>
+</html>
+

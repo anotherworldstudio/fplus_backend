@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.kbeauty.gbt.dao.LessonMapper">
+
+
+	<resultMap id="trainingListResultMap" type="com.kbeauty.gbt.entity.domain.Training">  
+		<result property="seq" column="seq"/>
+		<result property="trainingId" column="trainingId"/>
+		<result property="lessonId" column="lessonId"/>
+		<result property="userId" column="userId"/>
+		<result property="beforeImg" column="beforeImg"/>
+		<result property="afterImg" column="afterImg"/>
+		<result property="comment" column="comment"/>
+		<result property="statas" column="statas"/>
+		<result property="age" column="age"/>
+		<result property="gender" column="gender"/>
+		<result property="grade" column="grade"/>
+		<result property="score" column="score"/>
+		<result property="skinTone" column="skinTone"/>
+		<result property="seasonColor" column="seasonColor"/>
+		<result property="facialContour" column="facialContour"/>
+		<result property="editSkinTone" column="editSkinTone"/>
+		<result property="editSeasonColor" column="editSeasonColor"/>
+		<result property="editFacialContour" column="editfacialcontour"/>
+		<result property="category1" column="category1"/>
+		<result property="category2" column="category2"/>
+		<result property="userName" column="username"/>
+		<result property="lessonTitle" column="lessontitle"/>
+	</resultMap>
+	
+  	<select id="getLessonSeq" resultType="java.lang.Long">
+	    SELECT nextval('LESSON') as cnt
+    </select>    
+    
+    <select id="getLastOrder" resultType="java.lang.Integer" parameterType="java.lang.String">	    
+	    SELECT COALESCE(MAX(orders), 0) as odr FROM RESOURCES WHERE contentid = #{lessonId}
+    </select>
+    
+    <select id="getUserFaceList" resultType="com.kbeauty.gbt.entity.domain.UserFace" parameterType="java.lang.String">	    
+		 SELECT * FROM USERFACE WHERE userid = #{userId} AND delyn IS NULL
+    </select>
+    
+       <select id="getLessonList" parameterType="com.kbeauty.gbt.entity.view.LessonCondition"  
+                                resultType="com.kbeauty.gbt.entity.domain.Lesson">
+        SELECT * FROM LESSON WHERE 0=0
+        
+        <if test='lessonSeq>0'>
+        	and seq = #{lessonSeq}
+        </if>
+        
+        <if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+  		  		
+	    <if test='lessonType != null &amp;&amp; !"".equals(lessonType)'>
+    		and lessontype = #{lessonType}
+  		</if>
+  		  		
+	    <if test='ownerId != null &amp;&amp; !"".equals(ownerId)'>
+    		and ownerid = #{ownerId}
+  		</if>
+  		  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and status = #{status}
+  		</if>
+  		  		
+	    <if test='viewType != null &amp;&amp; !"".equals(viewType)'>
+    		and viewtype = #{viewType}
+  		</if>
+  		
+  		  <if test='active != null &amp;&amp; !"".equals(active)'>
+    		and active = #{active}
+  		</if>
+  		  	
+	    <if test='category1 != null &amp;&amp; !"".equals(category1)'>
+    		and category1 = #{category1}
+  		</if>  	
+  		
+	    <if test='category2 != null &amp;&amp; !"".equals(category2)'>
+    		and category2 = #{category2}
+  		</if>  	  	    
+  		
+  	    <choose>	
+  	    	<when test ='"1000".equals(ordersType)'>
+				ORDER BY seq asc
+			</when>
+			<when test ='"2000".equals(ordersType)'>
+				ORDER BY orders = 0  ASC,orders asc, seq desc
+			</when>
+			<otherwise>
+				ORDER BY seq desc
+			</otherwise>
+		</choose> 
+        
+		limit #{pageStart}, #{perPageNum}
+    </select>
+    
+    <select id="getLessonListCnt" parameterType="com.kbeauty.gbt.entity.view.LessonCondition"  
+                                            resultType="java.lang.Integer">
+        
+        select count(*) as cnt from LESSON
+        
+        where  0 = 0 
+        
+	    <if test='lessonSeq>0'>
+        	and seq = #{lessonSeq}
+        </if>
+        
+        <if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+  		  		
+	    <if test='lessonType != null &amp;&amp; !"".equals(lessonType)'>
+    		and lessontype = #{lessonType}
+  		</if>
+  		  		
+	    <if test='ownerId != null &amp;&amp; !"".equals(ownerId)'>
+    		and ownerid = #{ownerId}
+  		</if>
+  		  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and status = #{status}
+  		</if>
+  		  		
+	    <if test='viewType != null &amp;&amp; !"".equals(viewType)'>
+    		and viewtype = #{viewType}
+  		</if>
+  		
+  		<if test='active != null &amp;&amp; !"".equals(active)'>
+    		and active = #{active}
+  		</if>
+  		  	
+	    <if test='category1 != null &amp;&amp; !"".equals(category1)'>
+    		and category1 = #{category1}
+  		</if>  	
+  		
+	    <if test='category2 != null &amp;&amp; !"".equals(category2)'>
+    		and category2 = #{category2}
+  		</if>  	  	    
+  		
+    </select> 
+    
+    <select id="getLessonListByUserFace" parameterType="com.kbeauty.gbt.entity.view.LessonCondition"  
+                                		 resultType="com.kbeauty.gbt.entity.domain.Lesson">
+        SELECT a.* FROM
+        
+        ( SELECT * FROM LESSON WHERE 0=0
+        
+         <if test='lessonSeq>0'>
+        	and seq = #{lessonSeq}
+        </if>
+        
+        <if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+  		  		
+	    <if test='lessonType != null &amp;&amp; !"".equals(lessonType)'>
+    		and lessontype = #{lessonType}
+  		</if>
+  		  		
+	    <if test='ownerId != null &amp;&amp; !"".equals(ownerId)'>
+    		and ownerid = #{ownerId}
+  		</if>
+  		  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and status = #{status}
+  		</if>
+  		
+  		 <if test='active != null &amp;&amp; !"".equals(active)'>
+    		and active = #{active}
+  		</if>
+  		  	
+  		  		
+	    <if test='viewType != null &amp;&amp; !"".equals(viewType)'>
+    		and viewtype = #{viewType}
+  		</if>
+  		  	
+	    <if test='category1 != null &amp;&amp; !"".equals(category1)'>
+    		and category1 = #{category1}
+  		</if>  	
+  		
+	    <if test='category2 != null &amp;&amp; !"".equals(category2)'>
+    		and category2 = #{category2}
+  		</if>  	  	    
+  		)a INNER JOIN 
+  		(SELECT * FROM LESSONFACE WHERE TYPE=#{lessonFaceType} AND category = #{lessonFaceCategory}) b ON a.lessonid=b.lessonid
+  		
+  		ORDER BY a.seq desc 
+  		
+	
+    </select>
+
+ <select id="getLessonListCntByUserFace" parameterType="com.kbeauty.gbt.entity.view.LessonCondition"  
+                                            resultType="java.lang.Integer">
+        
+        
+        SELECT  count(*) as cnt FROM (SELECT a.* FROM 
+        (SELECT * FROM LESSON WHERE 0=0
+        
+        <if test='lessonSeq>0'>
+        	and seq = #{lessonSeq}
+        </if>
+        
+        <if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+  		  		
+	    <if test='lessonType != null &amp;&amp; !"".equals(lessonType)'>
+    		and lessontype = #{lessonType}
+  		</if>
+  		  		
+	    <if test='ownerId != null &amp;&amp; !"".equals(ownerId)'>
+    		and ownerid = #{ownerId}
+  		</if>
+  		  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and status = #{status}
+  		</if>
+  		  		
+	    <if test='viewType != null &amp;&amp; !"".equals(viewType)'>
+    		and viewtype = #{viewType}
+  		</if>
+  		
+  		<if test='active != null &amp;&amp; !"".equals(active)'>
+    		and active = #{active}
+  		</if>
+  		  	
+  		  	
+  		  	
+	    <if test='category1 != null &amp;&amp; !"".equals(category1)'>
+    		and category1 = #{category1}
+  		</if>  	
+  		
+	    <if test='category2 != null &amp;&amp; !"".equals(category2)'>
+    		and category2 = #{category2}
+  		</if> 
+  		  
+  		)
+        a JOIN (
+		SELECT * FROM LESSONFACE WHERE 
+			TYPE = '0000' AND category = #{age}
+	    OR TYPE ='1000' AND category = #{facialContour}
+		OR TYPE ='2000' AND category = #{seasonColor}
+		OR TYPE ='3000' AND category = #{skinTone}
+		OR TYPE ='4000' AND category = #{gender}
+		) b ON a.lessonid=b.lessonid GROUP BY a.lessonid)c
+  		
+    </select> 
+        	
+       <select id="getLessonFaceListByLessonIdAndType" parameterType="com.kbeauty.gbt.entity.domain.LessonFace"  
+                               				 resultType="com.kbeauty.gbt.entity.domain.LessonFace">
+              SELECT * FROM LESSONFACE WHERE lessonid = #{lessonId} and type = #{type} AND delyn is null
+                               				
+		</select>
+		<select id="getLessonFaceListByLessonId" parameterType="com.kbeauty.gbt.entity.domain.LessonFace"  
+                               				 resultType="com.kbeauty.gbt.entity.domain.LessonFace">
+              SELECT * FROM LESSONFACE WHERE lessonid = #{lessonId} AND delyn is null
+                               				
+		</select>
+		
+		<select id="getLessonFaceOverlapCheck" parameterType="com.kbeauty.gbt.entity.domain.LessonFace"  
+                               				 resultType="com.kbeauty.gbt.entity.domain.LessonFace">
+              SELECT * FROM LESSONFACE WHERE lessonid = #{lessonId} and type = #{type} AND category = #{category} and delyn is null                               				
+		</select>
+    
+	<select id="getOldTrainingCheck" parameterType="com.kbeauty.gbt.entity.domain.Training"  
+                                            resultType="java.lang.Integer">
+        SELECT  count(*) as cnt FROM TRAINING WHERE userid = #{userId} AND lessonid = #{lessonId} AND delyn IS NULL AND STATUS IN ('0000','1000')
+     </select>
+       <select id="getTrainingByLesson" parameterType="com.kbeauty.gbt.entity.domain.Training"  
+                                            		resultType="com.kbeauty.gbt.entity.domain.Training">
+        SELECT  * FROM TRAINING WHERE userid = #{userId} AND lessonid = #{lessonId} AND delyn IS NULL AND STATUS != '9000' ORDER BY seq DESC LIMIT 1
+     </select>
+        
+     <select id="getTrainingListByUser" parameterType="com.kbeauty.gbt.entity.domain.User"  
+                                            		resultType="com.kbeauty.gbt.entity.domain.Training">
+        SELECT  * FROM TRAINING WHERE userid = #{userId} AND delyn IS NULL ORDER BY seq DESC 
+     </select>
+    
+       <select id="getTrainingList" parameterType="com.kbeauty.gbt.entity.view.TrainingCondition"  
+                                resultMap="trainingListResultMap">
+        
+       	SELECT c.*,d.title as lessontitle FROM (
+       	SELECT a.*,b.username FROM (
+        SELECT * FROM TRAINING  where 0 = 0 
+        
+        <if test='trainingSeq>0'>
+        	and seq = #{contentSeq}
+        </if>
+        
+        <if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+	    
+	    	  		
+	    <if test='trainingId != null &amp;&amp; !"".equals(trainingId)'>
+    		and  trainingid= #{trainingId}
+  		</if>
+  		  		
+	    <if test='lessonId != null &amp;&amp; !"".equals(lessonId)'>
+    		and lessonid = #{lessonId}
+  		</if>
+  		<if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and userid = #{userId}
+  		</if>
+  		  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and status = #{status}
+  		</if>
+  		
+	    <if test='category1 != null &amp;&amp; !"".equals(category1)'>
+    		and category1 = #{category1}
+  		</if>  	
+  		
+	    <if test='category2 != null &amp;&amp; !"".equals(category2)'>
+    		and category2 = #{category2}
+  		</if>  	  	   
+  		 
+	    <if test='age != null &amp;&amp; !"".equals(age)'>
+    		and age = #{age}
+  		</if>  	  
+  		<if test='facialContour != null &amp;&amp; !"".equals(facialContour)'>
+    		and facialContour = #{facialContour}
+  		</if>  	    
+  		<if test='seasonColor != null &amp;&amp; !"".equals(seasonColor)'>
+    		and seasonColor = #{seasonColor}
+  		</if>  	    
+  		<if test='skinTone != null &amp;&amp; !"".equals(skinTone)'>
+    		and skinTone = #{skinTone}
+  		</if>  	    
+  		<if test='gender != null &amp;&amp; !"".equals(gender)'>
+    		and gender = #{gender}
+  		</if>  	    
+  		)a JOIN USER b on a.userid = b.userid
+  		)c JOIN LESSON d on c.lessonid = d.lessonid  
+  		 	  	    
+  	     <choose>
+  	     	
+  	    	<when test ='"1000".equals(ordersType)'>
+				ORDER BY c.seq ASC
+			</when>
+			
+			<otherwise>
+				ORDER BY c.seq desc
+			</otherwise>
+		</choose> 
+        
+        
+		limit #{pageStart}, #{perPageNum}
+    </select>
+    
+     <select id="getTrainingListCnt" parameterType="com.kbeauty.gbt.entity.view.TrainingCondition"  
+                              		 resultType="java.lang.Integer">
+        select count(*) as cnt from TRAINING
+        
+        where  0 = 0 
+        <if test='trainingSeq>0'>
+        	and seq = #{contentSeq}
+        </if>
+        
+        <if test='delYn == null'>
+	    	and delyn is null
+	    </if>
+	    
+	    <if test="delYn != null">
+	    	and delyn = #{delYn}
+	    </if>
+	   	  		
+	    <if test='trainingId != null &amp;&amp; !"".equals(trainingId)'>
+    		and  trainingid= #{trainingId}
+  		</if>
+  		  		
+	    <if test='lessonId != null &amp;&amp; !"".equals(lessonId)'>
+    		and lessonid = #{lessonId}
+  		</if>
+  		<if test='userId != null &amp;&amp; !"".equals(userId)'>
+    		and userid = #{userId}
+  		</if>
+  		  		
+	    <if test='status != null &amp;&amp; !"".equals(status)'>
+    		and status = #{status}
+  		</if>
+  		
+	    <if test='category1 != null &amp;&amp; !"".equals(category1)'>
+    		and category1 = #{category1}
+  		</if>  	
+  		
+	    <if test='category2 != null &amp;&amp; !"".equals(category2)'>
+    		and category2 = #{category2}
+  		</if>  	  	   
+  		 
+	    <if test='age != null &amp;&amp; !"".equals(age)'>
+    		and age = #{age}
+  		</if>  	  
+  		<if test='facialContour != null &amp;&amp; !"".equals(facialContour)'>
+    		and facialContour = #{facialContour}
+  		</if>  	    
+  		<if test='seasonColor != null &amp;&amp; !"".equals(seasonColor)'>
+    		and seasonColor = #{seasonColor}
+  		</if>  	    
+  		<if test='skinTone != null &amp;&amp; !"".equals(skinTone)'>
+    		and skinTone = #{skinTone}
+  		</if>  	    
+  		<if test='gender != null &amp;&amp; !"".equals(gender)'>
+    		and gender = #{gender}
+  		</if>
+  		  	    
+	 </select>
+        
+</mapper>

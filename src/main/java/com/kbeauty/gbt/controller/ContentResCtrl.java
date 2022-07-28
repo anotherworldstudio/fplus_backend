@@ -1,0 +1,54 @@
+package com.kbeauty.gbt.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.kbeauty.gbt.entity.domain.Content;
+import com.kbeauty.gbt.entity.domain.User;
+import com.kbeauty.gbt.entity.domain.Weather;
+import com.kbeauty.gbt.entity.enums.ErrMsg;
+import com.kbeauty.gbt.entity.view.AiRecommandProduct;
+import com.kbeauty.gbt.entity.view.ContentView;
+import com.kbeauty.gbt.entity.view.WeatherView;
+import com.kbeauty.gbt.service.ContentService;
+import com.kbeauty.gbt.service.UserService;
+import com.kbeauty.gbt.service.WeatherService;
+import com.kbeauty.gbt.util.TokenUtils;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
+
+@RestController
+@Api(value = "Content Controller")
+@RequestMapping("/v1/content")
+@Slf4j
+public class ContentResCtrl {
+	//아아아
+
+	@Autowired
+	private ContentService service;
+
+	@RequestMapping(value = "/ai_product", method = RequestMethod.POST)
+	public List<AiRecommandProduct> getAiRecommandProductList(HttpServletRequest request) {
+		List<AiRecommandProduct> list;
+		
+		try {
+			list = service.AiRecommandProduct();
+		} catch (Exception e) {
+			list = new ArrayList<>();
+		}
+
+		return list;
+	}
+
+}
