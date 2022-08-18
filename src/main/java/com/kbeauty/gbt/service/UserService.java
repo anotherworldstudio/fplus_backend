@@ -100,6 +100,9 @@ public class UserService extends CommonService {
 	@Autowired
 	private StorageService uploadSerivce;
 
+	@Autowired
+	private S3Uploader uploader;
+
 	@Value("${spring.cloud.gcp.storage.bucket}")
 	private String bucket;
 
@@ -194,10 +197,11 @@ public class UserService extends CommonService {
 		String imgId = CommonUtil.getGuid();
 		String neoFileName = FileUtil.getNeoFileName(imgId, orgFileName); // 확장자는 여기서 붙
 		String fileName = FileUtil.getStoragePath(userFolder, user.getUserId(), neoFileName, StoragePath.CONTENT_USER);
-
 		String dir = bucket;
 		user.setImageDir(dir);
 		user.setImageName(fileName);
+		//user.setImageName(uploader.upload(faceImg,"user"));
+
 
 		uploadSerivce.saveUserImg(faceImg, fileName);
 

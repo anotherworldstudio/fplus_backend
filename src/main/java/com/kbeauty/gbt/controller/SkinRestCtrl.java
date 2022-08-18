@@ -1,6 +1,7 @@
 package com.kbeauty.gbt.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,6 +64,7 @@ public class SkinRestCtrl {
 			HttpServletResponse response) throws Exception {
 
 		SkinResultView skinResultView = null;
+		
 		try {
 			skinResultView = service.deepSkin(faceImg, userId, fileName);
 			skinResultView.setOk();
