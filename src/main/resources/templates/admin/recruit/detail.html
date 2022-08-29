@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lagn="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/default">
+
+<th:block layout:fragment="content">
+
+    <!-- Javascript functions	-->
+    <script type="text/javascript">
+
+        document.addEventListener("DOMContentLoaded", function () {
+            setActiveChecked('activeChk', 'active');
+            $("#recruitType").val(recruit.recruitType);
+            changeRecruitType($('#recruitType').val());
+        });
+
+    </script>
+
+
+    <script th:inline="javascript">
+        var recruit = null;
+
+        /*<![CDATA[*/
+        recruit = /*[[${recruit}]]*/ "";
+        console.log(recruit);
+        /*]]>*/
+
+    </script>
+
+
+    <script>
+        function saveRecruit() {
+
+
+            setActive('activeChk', 'active');
+
+            form1.submit();
+        }
+
+        function editRecruit() {
+            setActive('activeChk', 'active');
+            setYn('replyYnChk', 'replyYn');
+
+            showModal("수정 하시겠습니까?", true, function () {
+                form1.action = "/w1/recruit/save_recruit";
+                form1.submit();
+            });
+
+        }
+
+        function deleteRecruit() {
+            showModal("삭제 하시겠습니까?", true, function () {
+                form1.action = "/w1/recruit/delete_recruit";
+                form1.submit();
+            });
+        }
+
+        function goList() {
+            location.href = "/w1/recruit/go_list";
+        }
+
+        function deleteResource(recruitId, resourceId) {
+            showModal("삭제 하시겠습니까?", true, function () {
+
+                $('#recruitId').val(recruitId);
+                $('#deleteResourceId').val(resourceId);
+
+
+                location.href = "/w1/resource/delete?recruitId=" + $('#recruitId').val() + "&deleteResourceId=" + $('#deleteResourceId').val() + "&pageName=content"
+
+            });
+        }
+
+
+        function clearResourceM() {
+            $("#resourceTypeM").val("").prop("selected", false);
+            $("#resourceTitleM").val("");
+            $("#resourceContentM").val("");
+            $("#urlM").val("");
+            $("#resourceSeqM").val("");
+            $("#contentIdM").val("");
+            $("#resourceIdM").val("");
+        }
+
+        function addResource() {
+            clearResourceM();
+            $("#resourceSeqSpan").html(" 신규 등록");
+
+            var contentId = $("#contentId").val();
+            $("#contentIdM").val(contentId);
+
+            $('#resourceForm').modal("show");
+        }
+
+
+        function getRow(recruit) {
+            var row = "\n";
+            row = row + "<tr class='even pointer'>                                     ";
+            row = row + "  <td class=''>" + recruit.seq + "</td>         ";
+            row = row + "  <td class=''>" + recruit.userName + "</td>";
+            row = row + "<td class=''>";
+            row = row + "</td>";
+
+
+            row = row + "<td class=''>";
+
+            //row = row + "<td class=''>";
+            row = row + "</td>";
+
+
+            row = row + "</tr>                                      ";
+
+            return row;
+        }
+
+        function saveRecruit(){
+
+            /*<![CDATA[*/
+            var recruitId = "[[${recruitView.recruit.recruitId}]]";
+            /*]]>*/
+
+
+            if(recruitId == ""){
+                showModal("등록 하시겠습니까?", true, function(){
+                    form1.submit();
+                });
+            }else{
+                showModal("수정 하시겠습니까?", true, function(){
+                    form1.submit();
+                });
+            }
+
+        }
+
+    </script>
+
+    <div class="">
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="x_panel">
+
+                    <div class="x_title">
+                        <h2>
+                            Content 상세
+                        </h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                            <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div class="x_content">
+
+                        <form class="form-horizontal form-label-left" th:object=${recruitView.recruit}
+                              th:action="@{/w1/recruit/save}" method="post" enctype="multipart/form-data" id="form1"
+                              name="form1" novalidate>
+                            <input type="hidden" name="seq" id="seq" th:value="*{seq}"/>
+                            <input type="hidden" name="recruitId" id="recruitId" th:value="*{recruitId}"/>
+                            <input type="hidden" name="active" id="active" th:value="*{active}"/>
+                            <input type="hidden" name="depth" id="depth" th:value="*{depth}"/>
+                            <input type="hidden" name="path" id="path" th:value="*{path}"/>
+                            <input type="hidden" name="ownerId" id="ownerId" th:value="*{userId}"/>
+
+                            <span class="section">공고 번호 : <span th:text="*{seq}"></span></span>
+                            <div class="form-group row align-items-center">
+                                <label class="control-label col-md-2 col-sm-2 ">공고 구분<span
+                                        class="required">*</span></label>
+                                <div class="col-md-4 col-sm-4 ">
+                                    <select required class="form-control" name="recruitType" id="recruitType">
+                                        <option th:each="recruitType : ${T(com.kbeauty.gbt.entity.enums.RecruitType).values()}"
+                                                th:value="${recruitType.code}" th:text="${recruitType.val}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label class="control-label col-md-2 col-sm-2 ">제목</label>
+                                <div class="col-md-10 col-sm-10 ">
+                                    <input type="text" class="form-control" placeholder="제목" name="title" id="title"
+                                           th:value="*{title}">
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label class="control-label col-md-2 col-sm-2 ">내용<span class="required">*</span>
+                                </label>
+                                <div class="col-md-10 col-sm-10 ">
+                                    <textarea class="form-control" required="required" rows="5" placeholder=""
+                                              name="content" id="content" th:text="*{content}"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="control-label col-md-2 col-sm-2 ">기간</label>
+                                <div class="col-md-2 col-sm-2 ">
+
+                                    <input type="date" class="form-control" placeholder="시작일자" name="startDate"
+                                           id="startDate" th:value="*{startDate}">
+                                </div>
+                                <div class="col-md-2 col-sm-2 ">
+                                    <input type="date" class="form-control" placeholder="종료일자" name="endDate"
+                                           id="endDate" th:value="*{endDate}">
+                                </div>
+                            </div>
+
+                            <div class="form-group row align-items-center">
+                                <label class="control-label col-md-2 col-sm-2 ">Content 상태<span
+                                        class="required">*</span></label>
+                                <div class="col-md-4 col-sm-4 ">
+                                    <select required class="form-control" name="status" id="status">
+                                        <option value="">선택하세요</option>
+                                        <option value="0000" th:selected="*{status}=='0000'">등록</option>
+                                    </select>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="form-group">
+                    <div class="col-md-12 col-sm-12 " style="text-align: right;">
+                        <button type='button' class="btn btn-primary" id="saveRecruitBtn" style="position: center;" onClick="saveRecruit()">저장하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            </form>
+
+
+        </div>
+
+    </div>
+    </div>
+
+    <!-- -----------------  -->
+    </div>
+    </div>
+
+
+</th:block>
+
+
+</html>

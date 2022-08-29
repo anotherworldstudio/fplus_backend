@@ -47,6 +47,14 @@
 								<li><a href="/w1/user/go_create">사용자 등록</a></li>
 							</ul></li>
 						<li>
+
+						<li th:if="${session.userRole.equals('0000')}" ><a><i class="fa fa-user"></i> 공고 관리 <span
+								class="fa fa-chevron-down"></span></a>
+							<ul class="nav child_menu">
+								<li><a href="/w1/recruit/go_list?reset=Y">공고 목록</a></li>
+								<li><a href="/w1/recruit/go_create">공고 등록</a></li>
+							</ul></li>
+						<li>
 						
 						<a><i class="fa fa-edit"></i> 실습 관리<span
 								class="fa fa-chevron-down"></span></a>

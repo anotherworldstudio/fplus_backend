@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lagn="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/default">
+
+<th:block layout:fragment="content">	
+
+<!-- Javascript functions	-->
+<script type="text/javascript">
+    
+	document.addEventListener("DOMContentLoaded", function(){
+	    $('#listBody').empty();
+	    $('#pagination').empty();
+	    
+	    
+		/*<![CDATA[*/
+		var recruitType = "[[${condition.recruitType}]]";
+		var active = "[[${condition.active}]]";
+		var status = "[[${condition.status}]]";
+		
+		var page = "[[${condition.page}]]";
+		var perPageNum = "[[${condition.perPageNum}]]";
+
+
+		/*]]>*/
+		
+		$('#recruitType').val(recruitType);
+		$('#active').val(active);
+		$('#status').val(status);
+	    
+		
+		search(page, perPageNum);
+	});    
+	
+	function goDetail(recruitId){
+		location.href="/w1/recruit/detail/"+recruitId;
+	}
+	
+	function search(page, perPageNum){
+		var recruitType = $('#recruitType').val();
+		var active = $('#active').val();
+		var searchUserName = $('#searchUserName').val();
+
+		
+		var param = {};
+			param.searchUserName= searchUserName;
+	    param.recruitType = recruitType;
+	    param.active = active;
+
+
+	    if(page !=null){
+	    	param.page = page;
+	    }
+	    
+	    if(perPageNum !=null){
+	    	param.perPageNum = perPageNum;
+	    }	    
+	    
+	    param = JSON.stringify(param);
+		
+	    $('#listBody').empty();
+	    $('#pagination').empty();
+	    
+		$.ajax({
+	        url : "/w1/recruit/list",
+	        data : param,
+	        type : 'post',
+	        contentType:"application/json; charset=UTF-8",
+	        dataType:"json",
+	        success : function(data){
+	            var results = data.list;
+                // console.log(data);
+	            var rows = "";
+	            $.each(results, function(index, item) {
+
+                    // rows = rows + getRow(item.content, item.count);
+                    rows = rows + getRow(item.recruit);
+                    console.log(item);
+
+				});	            
+	            	            
+	            $('#listBody').append(rows);
+	            
+	            var paging = getPageDiv(data.paging);	            
+	            $('#pagination').append(paging);
+
+                console.log(param);
+
+                //console.log(results);
+	            //console.log(data.paging);
+	        },
+	        error : function(e){
+	        	console.log(e);
+	        }
+        });
+		
+	}
+
+    function getRow(recruit){
+        var row = "\n";
+        row = row + "<tr class='even pointer'>                                     ";
+        row = row + "  <td class='a-center '>                                      ";
+        row = row + "    <input type='checkbox' class='flat' name='table_records'> ";
+        row = row + "  </td>                                                       ";
+        row = row + "  <td class=''><a href='#' onClick='goDetail(\"" + recruit.recruitId + "\")'>"+ recruit.seq + "</a></td>         ";
+        // row = row + "  <td class=''>"+ recruit.recruitTypeName + "</td>                 ";
+        row = row + "  <td class=''>"+ recruit.userName + "</td>                         ";
+        row = row + "  <td class=''>"+ recruit.title + "</td>                                        ";
+        row = row + "  <td class=''>"+ recruit.recruitTypeName + "</td>                                        ";
+        row = row + "  <td class=''>"+ recruit.activeName + "</td>                                        ";
+        row = row + "  </td>                                                       ";
+        row = row + "</tr>                                                         ";
+		
+		return row;
+	}
+	
+	function getPageDiv(paging){
+	
+	  var pageDiv = "";
+	  if(paging == null) return;
+	  
+	  var previosPage = paging.startPage - 1;
+	  var perPage = paging.displayPageNum;
+	  var nextPage = paging.endPage + 1;
+	  var startPage = paging.startPage;
+	  var endPage = paging.endPage;
+	  var currPage = paging.page;	  
+		  
+   	  pageDiv = pageDiv + "<div class='row'>                                                ";
+      pageDiv = pageDiv + "  <div class='btn-group' role='group'>                           ";
+      
+      if(paging.prev){    	  
+      	pageDiv = pageDiv + "    <button type='button' class='btn btn-secondary' onClick='search(" + previosPage + ", " + perPage + ")'>이전</button>  ";
+      }else{
+      	pageDiv = pageDiv + "    <button type='button' class='btn btn-secondary' disabled>이전</button>  ";
+      }
+      
+      for( i = startPage ; i <= endPage ; i++ ){
+    	  if(currPage == i){
+    		 pageDiv = pageDiv + "<button type='button' class='btn btn-secondary' disabled>" + i + "</button>";    		  
+    	  }else{    		  
+    	  	pageDiv = pageDiv + "<button type='button' class='btn btn-secondary' onClick='search(" + i + ", " + perPage + ")'>" + i + "</button>   ";
+    	  }
+    	  
+      }
+      
+      if(paging.next){    	  
+       	pageDiv = pageDiv + "    <button type='button' class='btn btn-secondary' onClick='search(" + nextPage + ", " + perPage + ")'>다음</button>  ";
+       }else{
+       	pageDiv = pageDiv + "    <button type='button' class='btn btn-secondary' disabled>다음</button>  ";
+       }
+      
+      
+      pageDiv = pageDiv + "  </div>                                                         ";
+      pageDiv = pageDiv + "</div>                                                           ";
+      
+      return pageDiv;
+	}
+	
+
+</script>
+
+ <div class="x_content"> 
+  <div class="row">
+	<label class="control-label col-md-1 col-sm-1 ">구분<span class="required">*</span></label>
+	<div class="col-md-4 col-sm-4 ">
+        <select required class="form-control" name="recruitType" id="recruitType">
+            <option th:each="recruitType : ${T(com.kbeauty.gbt.entity.enums.RecruitType).values()}"
+                    th:value="${recruitType.code}" th:text="${recruitType.val}"></option>
+        </select>
+	</div>
+				<label class="control-label col-md-1 col-sm-1 ">회원닉네임:</label> <input
+				type="text" name="searchUserName" id="searchUserName" style="height: 35px">
+			<div class="col-md-4 col-sm-4 "></div>
+		</div>
+  <div class="row">
+	<label class="control-label col-md-1 col-sm-1 ">상태</label>
+	<div style="width:147px;  max-width: 50%; padding-right: 0px;  padding-left: 0px;">		
+		<select required class="form-control" name="status" id="status">
+			<option value="">선택하세요</option>
+			<option value="0000">등록</option>
+		</select>
+	</div>
+      <div class="col-md-1 col-sm-1 center">
+          <button type="button" class="btn btn-round btn-primary" onClick="search()">조회</button>
+      </div>
+	
+  </div>  
+  <p><h5></h5></p>
+  <span class="section" style="text-align: right;padding-right: 10px;"></span>
+    
+  <div class="table-responsive">
+    <table class="table table-striped jambo_table bulk_action">
+      <thead>
+        <tr class="headings">
+          <th>
+            <input type="checkbox" id="check-all" class="flat">
+          </th>
+          <th class="column-title">순번 </th>
+          <th class="column-title">등록자</th>
+            <th class="column-title">제목</th>
+          <th class="column-title">종류</th>
+          <th class="column-title">활성화</th>
+          <th class="bulk-actions" colspan="11">
+            <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
+          </th>
+        </tr>
+      </thead>
+
+          <tbody id="listBody">
+            
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-12 col-sm-12" id="pagination" style="display: flex;justify-content: center;">
+		   <div class="row">
+             <div class="btn-group" role="group">
+               <button type="button" class="btn btn-secondary">이전</button>
+               
+               <button type="button" class="btn btn-secondary">1</button>
+               <button type="button" class="btn btn-secondary">2</button>
+               <button type="button" class="btn btn-secondary">3</button>
+               
+               <button type="button" class="btn btn-secondary">다음</button>
+             </div>
+           </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      
+</th:block>
+</html>

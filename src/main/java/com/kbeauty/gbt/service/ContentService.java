@@ -235,6 +235,7 @@ public class ContentService {
 	}
 
 	public int getContentListCnt(ContentCondition condition) {
+
 		return contentMapper.getContentListCnt(condition);
 	}
 

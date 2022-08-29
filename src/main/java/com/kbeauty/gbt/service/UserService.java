@@ -165,28 +165,6 @@ public class UserService extends CommonService {
 		String dateStr = CommonUtil.getSysTime();
 		user.setBasicInfo(dateStr, userId);
 
-//		// 
-//		if( ! isNew) {
-//			// 기존 사용자 조회 이후에 해당 항목만 수정함
-//			// 이멜/사용자명/생년월일/성별/휴대폰/국적//사용자구분//로그인구분/마켓팅/상태/비고
-//			userId = user.getUserId();
-//			User oldUser = getUser(userId);
-//			oldUser.setEmail(user.getEmail());
-//			oldUser.setUserName(user.getUserName());
-//			oldUser.setBirthDay(user.getBirthDay());
-//			oldUser.setSex(user.getSex());
-//			oldUser.setCellphone(user.getCellphone());
-//			oldUser.setCountry(user.getCountry());
-//			oldUser.setUserRole(user.getUserRole());
-//			oldUser.setOauthType(user.getOauthType());
-//			oldUser.setMarketingYn(user.getMarketingYn());
-//			oldUser.setStatus(user.getStatus());			
-//			oldUser.setComment(user.getComment());
-//			
-//			repo.save(oldUser); 
-//			return oldUser;
-//		}else {
-//		}
 		repo.save(user);
 		return user;
 	}

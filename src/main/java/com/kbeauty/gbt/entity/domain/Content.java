@@ -76,8 +76,8 @@ public class Content extends CommonDomain {
 
 	
 	@Transient private String upperContentId    ; //프로그램에서 생성 
-	@Transient private String ownerName         ; //User 조회해서 생성 
-	@Transient private String ownerImgUrl       ; //User 조회해서 생성 
+	@Transient private String ownerName         ; //User 조회해서 생성
+	@Transient private String ownerImgUrl       ; //User 조회해서 생성
 	@Transient private ImageData ownerImgData;
 	
 //Enum으로 설정
@@ -103,10 +103,11 @@ public class Content extends CommonDomain {
 		statusName = CommonUtil.getValue(ContentStatus.values(), status);
 		
 	}
-	
+
 	public boolean isMainImg() {
 		return ! StringUtil.isEmpty(mainDir);
 	}
+
 	
 	public boolean isProduct() {
 		return ContentType.PRODUCT.getCode().equals(contentType);

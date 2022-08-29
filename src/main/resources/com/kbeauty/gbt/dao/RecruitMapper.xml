@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kbeauty.gbt.dao.RecruitMapper">
+
+    <resultMap id="recruitListResultMap" type="com.kbeauty.gbt.entity.domain.Recruit">
+        <result property="seq" column="seq" />
+        <result property="recruitId" column="recruitid" />
+        <result property="recruitType" column="recruittype" />
+        <result property="title" column="title" />
+        <result property="active" column="active" />
+        <result property="content" column="content" />
+        <result property="status" column="status" />
+        <result property="depth" column="depth"/>
+        <result property="userId" column="userid" />
+    </resultMap>
+
+
+    <select id="getRecruitList" parameterType="com.kbeauty.gbt.entity.view.RecruitCondition"
+            resultMap="recruitListResultMap">
+        select * from RECRUIT
+
+        <![CDATA[
+        where path < #{path} and depth = 0
+        ]]>
+
+        <if test='delYn == null'>
+            and delyn is null
+        </if>
+
+        <if test="delYn != null">
+            and delyn = #{delYn}
+        </if>
+
+        <if test='recruitType != null &amp;&amp; !"".equals(recruitType)'>
+            and recruittype = #{recruitType}
+        </if>
+
+        <if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>
+            and userid = (SELECT userid FROM USER WHERE username = #{searchUserName})
+        </if>
+
+        <if test='status != null &amp;&amp; !"".equals(status)'>
+            and status = #{status}
+        </if>
+
+        limit #{pageStart}, #{perPageNum}
+    </select>
+
+    <select id="getRecruitListCnt" parameterType="com.kbeauty.gbt.entity.view.RecruitCondition"
+            resultType="java.lang.Integer">
+        SELECT count(*) from RECRUIT
+
+        where  depth = 0
+
+        <if test='delYn == null'>
+            and delyn is null
+        </if>
+
+        <if test="delYn != null">
+            and delyn = #{delYn}
+        </if>
+
+        <if test='recruitType != null &amp;&amp; !"".equals(recruitType)'>
+            and recruittype = #{recruitType}
+        </if>
+
+        <if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>
+            and userid = (SELECT userid FROM USER WHERE username = #{searchUserName})
+        </if>
+
+        <if test='status != null &amp;&amp; !"".equals(status)'>
+            and status = #{status}
+        </if>
+
+
+    </select>
+
+    <select id ="resourcesFile"  resultType="com.kbeauty.gbt.entity.domain.Resources">
+        SELECT * FROM RESOURCES WHERE NOT filename IS NULL
+    </select>
+
+    <select id="getRecruitSeq" resultType="java.lang.Long">
+        SELECT `nextval`('recruit');
+    </select>
+
+
+</mapper>
