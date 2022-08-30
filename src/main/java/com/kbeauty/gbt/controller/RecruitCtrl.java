@@ -155,34 +155,7 @@ public class RecruitCtrl {
 		list.setOk();
 		return list;
 	}	
-	
-	@RequestMapping(value="/delete_main-img")
-	@ResponseBody
-	public Recruit deleteManiImg(HttpServletRequest request, @RequestBody Recruit recruit) {
-		
-		if(recruit == null) {
-			recruit.setError(ErrMsg.CONTENT_NO_SAVE_ERR);
-			return recruit;
-		}
-		String recruitId = recruit.getRecruitId();
-		
-		if(StringUtil.isEmpty(recruitId)) {
-			recruit.setError(ErrMsg.CONTENT_NO_SAVE_ERR);
-			return recruit;
-		}
-		
-		String userId = login.getUserId();
-		
-		Recruit dbcontent = service.getRecruit(recruitId);
-		dbcontent.setMainImage("");
-		
-		recruit = service.saveRecruit(dbcontent, userId);
-		recruit.setOk();
 
-		recruit.setMainImage(RecruitService.NO_RECRUIT_IMG_PATH);
-		
-		return recruit;
-	}	
 	
 	@RequestMapping(value="/detail/{recruitId}", method=RequestMethod.GET)
 	public String getRecruitView(
@@ -206,36 +179,37 @@ public class RecruitCtrl {
 	}
 	
 	@RequestMapping(value="/save_recruit", method=RequestMethod.POST, headers="Content-Type=multipart/form-data")
-	public String save(Recruit recruit, @RequestParam("mainUploadFile") MultipartFile mainFile) throws Exception{
+	public String save(Recruit recruit) throws Exception{
 		
 		if(recruit == null) {
 			recruit.setError(ErrMsg.CONTENT_NO_SAVE_ERR);
 			return "error";
 		}
-		String recruitId = recruit.getRecruitId();
-		
-		if(StringUtil.isEmpty(recruitId)) {
+//		recruit가 null이면 NOSAVEERR
+
+		String RecruitId = recruit.getRecruitId();
+
+		if(StringUtil.isEmpty(RecruitId)) {
 			recruit.setError(ErrMsg.CONTENT_NO_SAVE_ERR);
 			return "error";
 		}
 		
 		String userId = login.getUserId();
 
-		Recruit dbcontent = service.getRecruit(recruitId);
-		dbcontent.setRecruitType (recruit.getRecruitType ());
-		dbcontent.setTitle       (recruit.getTitle       ());
-		dbcontent.setContent     (recruit.getContent     ());
-		dbcontent.setStartDate   (recruit.getStartDate   ());
-		dbcontent.setEndDate     (recruit.getEndDate     ());
-		dbcontent.setActive      (recruit.getActive      ());
-		dbcontent.setStatus      (recruit.getStatus      ());
+		Recruit dbRecruit = service.getRecruit(RecruitId);
+		dbRecruit.setRecruitType (recruit.getRecruitType ());
+		dbRecruit.setTitle       (recruit.getTitle       ());
+		dbRecruit.setContent     (recruit.getContent     ());
+		dbRecruit.setStartDate   (recruit.getStartDate   ());
+		dbRecruit.setEndDate     (recruit.getEndDate     ());
+		dbRecruit.setActive      (recruit.getActive      ());
+		dbRecruit.setStatus      (recruit.getStatus      ());
 
-		dbcontent.setMainImage    (recruit.getMainImage    ());
+		recruit = service.saveRecruit(dbRecruit, userId);
 
-		recruit = service.saveRecruit(dbcontent, userId);
-		
+
 		recruit.setOk();
-		
+
 		String nextPage = "redirect:/w1/recruit/detail/" + recruit.getRecruitId();
 		return nextPage;
 	}

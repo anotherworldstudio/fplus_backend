@@ -2,9 +2,9 @@ package com.kbeauty.gbt.entity.enums;
 
 public enum RecruitType implements CodeVal{
 //    ( 0000 = 오디션 , 1000 = 채용, 2000 = 이벤트, 9999 = 전체 )
-    AUDITION("0000","오디션"),
-    EMPLOYMENT("1000","채용"),
-    EVENT("3000","이벤트");
+EMPLOYMENT("1111","채용"),
+    AUDITION("2222","오디션"),
+    EVENT("3333","이벤트");
 
 
     private String code;

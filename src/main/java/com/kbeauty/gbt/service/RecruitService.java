@@ -58,42 +58,6 @@ public class RecruitService {
 	@Value("${spring.cloud.gcp.storage.url}")
 	private String storageUrl;
 
-	
-	private FileInfo getFileInfo(String type,String filename,String urlLink) {
-		if(filename==null || "".equals(filename)) {
-			return new FileInfo();
-		}
-		return getFileInfo(type, filename, urlLink,null);
-	}
-
-	private FileInfo getFileInfo(String type,String filename,String urlLink,String userId) {
-		FileInfo fileInfo = fileInfoRepo.findByFilename(filename);
-		if(fileInfo == null) {
-			fileInfo = new FileInfo();
-			fileInfo.setBasicInfo(userId);
-			fileInfo.setFilename(filename);
-			fileInfo.setType(type);
-			if(filename!=null&&!"".equals(filename)) {
-			}
-			String array[] = filename.split("[.]");
-			if (array[array.length - 1].length() < 10)
-				fileInfo.setExtension(array[array.length - 1]);
-			try {
-				URL url = new URL(urlLink);
-				Image image = ImageIO.read(url);
-				fileInfo.setWidth(image.getWidth(null));
-				fileInfo.setHeight(image.getHeight(null));
-			} catch (Exception e) {
-			}
-			FileInfo fileInfo2 = fileInfoRepo.findByFilename(filename);
-			if(fileInfo2 == null) {
-				fileInfoRepo.save(fileInfo);
-			}
-		}else {
-			
-		}
-		return fileInfo;
-	}
 
 
 	/**
@@ -142,11 +106,6 @@ public class RecruitService {
 	public Recruit getRecruit(String recruitId) {
 		Recruit recruit = recruitRepo.findByRecruitId(recruitId);
 		return recruit;
-	}
-
-	public Resources getResource(String resourceId) {
-		Resources resource = resourceRepo.findByResourceId(resourceId);
-		return resource;
 	}
 
 	private void setRecruitUserInfo(Recruit recruit) {
@@ -246,56 +205,14 @@ public class RecruitService {
 		recruit.setBasicInfo(dateStr, userId);
 		save(recruit);
 
-//		List<Resources> resourceList = resourceRepo.findByContentId(content.getContentId());
-//		if(resourceList.size()>0) {
-//			for (Resources resources : resourceList) {
-//				resources.setDelete();
-//				save(resources);
-//			}
-//		}
-		
 		return recruit;
 	}
 
-	public Resources deleteResource(String resourceId, String userId) {
-		String dateStr = CommonUtil.getSysTime();
-		Resources resource = getResource(resourceId);
-		resource.setDelete();
-		resource.setBasicInfo(dateStr, userId);
-		save(resource);
-		return resource;
-	}
 
 	public Recruit saveRecruit(Recruit recruit, String userId) {
 		String dateStr = CommonUtil.getSysTime();
-
-		if (StringUtil.isEmpty(recruit.getRecruitId())) {
-			recruit.setRecruitType(RecruitType.EVENT.getCode());
-		}
-
-		if (StringUtil.isEmpty(recruit.getActive())) {
-			recruit.setActive(ContentActive.PASSIVE.getCode());
-		}
-
-		if (StringUtil.isEmpty(recruit.getStatus())) {
-			recruit.setStatus(ContentStatus.REG.getCode());
-		}
-
-		recruit.setBasicInfo(dateStr, userId);
-		save(recruit);
-
-		return recruit;
-	}
-
-//TODO:수정 메소드
-	
-	public RecruitView saveRecruidView(RecruitView view, String loginId) {
-		// Content
-		String dateStr = CommonUtil.getSysTime();
-		Recruit recruit = view.getRecruit();
-		String recruitId = recruit.getRecruitId();
-
-		if (StringUtil.isEmpty(recruit.getRecruitType())) {
+//		TODO:
+		if(StringUtil.isEmpty(recruit.getRecruitType())) {
 			recruit.setRecruitType(RecruitType.EVENT.getCode());
 		}
 
@@ -307,14 +224,17 @@ public class RecruitService {
 			recruit.setStatus(RecruitStatus.REG.getCode());
 		}
 
-		recruit.setBasicInfo(dateStr, loginId);
+		recruit.setBasicInfo(dateStr, userId);
 		save(recruit);
 
-		return view;
+		return recruit;
 	}
 
+//TODO:수정 메소드
+
+
 	/**
-	 * 화면에서 조회할 때는 사용하는 함수
+	 * 화면에서 조회할 때 사용하는 함수
 	 * 
 	 * @param recruitId
 	 * @param userId
@@ -442,225 +362,7 @@ public class RecruitService {
 	}
 
 
-	public Resources saveResource(MultipartFile file, Resources inputResource, String userId) throws IOException {
-		String dateStr = CommonUtil.getSysTime();
-		Resources oldResource = getResource(inputResource.getResourceId());
-		Resources neoResource = null;
 
-		if (FileUtil.isEmpty(file)) { // 신규 파일이 없다.
-			// 이미지/동영상 ==> 유트뷰
-			if (ResourceType.isStorageUrl(oldResource.getResourceType())) {
-				if (ResourceType.isStorageUrl(inputResource.getResourceType())) { // 파일 ==> 파일
-					// 문구/Link 만 변경 가능함.
-					oldResource.setResourceContent(inputResource.getResourceContent());
-					if (!StringUtil.isEmpty(inputResource.getOrders())) {
-						oldResource.setOrders(inputResource.getOrders());
-					}
-
-					oldResource.setResourceTitle(inputResource.getResourceTitle());
-					oldResource.setUrl(inputResource.getUrl());
-					oldResource.setBasicInfo(dateStr, userId);
-					if(inputResource.getResourceCategory()!=null && !"".equals(inputResource.getResourceCategory())){
-						oldResource.setResourceCategory(inputResource.getResourceCategory());
-					}
-					save(oldResource);
-					neoResource = oldResource;
-				} else { // 파일 ==> URL
-					oldResource.setDelete();
-					oldResource.setBasicInfo(dateStr, userId);
-					save(oldResource);
-
-					neoResource = getResources(file, userId, inputResource.getContentId(),
-							inputResource.getResourceTitle(), inputResource.getResourceContent(),
-							inputResource.getUrl(),inputResource.getResourceCategory());
-
-					if (!StringUtil.isEmpty(inputResource.getOrders())) {
-						oldResource.setOrders(inputResource.getOrders());
-					} else {
-						neoResource.setOrders(oldResource.getOrders());
-					}
-
-					neoResource = createFile(file, userId, neoResource);
-				}
-			} else { // 유튜브 ==> 유튜브
-						// 데이터만 업데이트 ==> order 유지
-				if (!StringUtil.isEmpty(inputResource.getOrders())) {
-					oldResource.setOrders(inputResource.getOrders());
-				}
-				if (ResourceType.isProduct(inputResource.getResourceType())) {
-					Recruit re = recruitRepo.findByRecruitId(inputResource.getUrl());
-					if(re==null) {
-						long searchContentSeq = Long.parseLong(inputResource.getUrl());
-						re = recruitRepo.findById(searchContentSeq).get();
-						oldResource.setResourceName("" + searchContentSeq);
-					}else {
-						oldResource.setResourceName("" + re.getSeq());
-					}
-					try {
-						RecruitView view = getRecruitViewByContent(re, null);
-						re = view.getRecruit();
-						oldResource.setResourceTitle(re.getTitle());
-						oldResource.setResourceContent(re.getContent());
-						if(re.getMainImage()!=null && !"".equals(re.getMainImage())) {
-							oldResource.setDir(re.getMainImage());
-						}
-						oldResource.setUrl(re.getRecruitId());
-						save(oldResource);
-						neoResource = oldResource;
-						return neoResource;
-					} catch (NoSuchElementException e) {
-						return null;
-					} catch (Exception e) {
-						return null;
-					}
-
-				}
-				oldResource.setResourceContent(inputResource.getResourceContent());
-				oldResource.setResourceTitle(inputResource.getResourceTitle());
-				if(inputResource.getResourceCategory()!=null && !"".equals(inputResource.getResourceCategory())){
-					oldResource.setResourceCategory(inputResource.getResourceCategory());
-				}
-				oldResource.setUrl(inputResource.getUrl()); // 수정용
-				oldResource.setResourceName(FileUtil.getYoutubeId(inputResource.getUrl())); // Utube id
-				oldResource.setBasicInfo(dateStr, userId);
-				save(oldResource);
-				neoResource = oldResource;
-			}
-		} else { // 신규 파일이 있다, 파일도 변경해야 함.
-			// 신규 데이터 추가
-			neoResource = getResources(file, userId, inputResource.getContentId(), inputResource.getResourceTitle(),
-					inputResource.getResourceContent(), inputResource.getUrl(),inputResource.getResourceCategory());
-			if (!StringUtil.isEmpty(inputResource.getOrders())) {
-				neoResource.setOrders(inputResource.getOrders());
-			} else {
-				neoResource.setOrders(oldResource.getOrders()); // ==> order 유지
-			}
-			createFile(file, userId, neoResource);
-			getFileInfo(FileInfoType.RESOUCES.getCode(), neoResource.getFilename(), getUrl(neoResource));
-
-			// 기존 데이터 삭제 처리
-			oldResource.setDelete();
-			oldResource.setBasicInfo(dateStr, userId);
-			save(oldResource);
-		}
-		
-		return neoResource;
-	}
-
-	public Resources addResource(MultipartFile file, Resources inputResource, String userId) throws IOException {
-		long seq = inputResource.getSeq();
-		Resources neoResource = null;
-		if (seq == 0) {// 신규 ==> seq 여부
-			neoResource = getResources(file, userId, inputResource.getContentId(), inputResource.getResourceTitle(),
-					inputResource.getResourceContent(), inputResource.getUrl(),inputResource.getResourceType(),inputResource.getResourceCategory());
-			if (neoResource == null) {
-				return null;
-			}
-			createFile(file, userId, neoResource);
-			if(neoResource.getFilename()!=null&&!"".equals(neoResource.getFilename())) {
-				getFileInfo(FileInfoType.RESOUCES.getCode(), neoResource.getFilename(), getUrl(neoResource),userId);
-			}
-		}
-
-		return neoResource;
-	}
-
-	public Resources getResources(MultipartFile file, String userId, String contentId, String title, String content,
-			String url) {
-		return getResources(file, userId, contentId, title, content, url, null);
-	}
-	public Resources getResources(MultipartFile file, String userId, String contentId, String title, String content,
-			String url, String resourceType) {
-		return getResources(file, userId, contentId, title, content, url,null,null);
-	}
-	public Resources getResources(MultipartFile file, String userId, String contentId, String title, String content,
-			String url, String resourceType,String resourceCategory) {
-		Resources resource = new Resources();
-		resource.setContentId(contentId);
-		String resourceId = CommonUtil.getGuid();
-		resource.setResourceId(resourceId);
-		resource.setResourceTitle(title);
-		resource.setResourceContent(content);
-		if(resourceCategory!=null && !"".equals(resourceCategory)) {
-			resource.setResourceCategory(resourceCategory);
-		}		
-		
-		if (resourceType != null) {
-			resource.setResourceType(resourceType);
-		} else {
-			if (FileUtil.isEmpty(file)) {
-				if (StringUtil.isUrl(url)) {
-					resource.setResourceType(ResourceType.UTUBE.getCode());
-				} else {
-					resource.setResourceType(ResourceType.PRODUCT.getCode());
-				}
-			} else {
-				resource.setResourceType(ResourceType.getCode(file).getCode());
-			}
-		}
-
-		if (ResourceType.isStorageUrl(resource.getResourceType())) { // 이미지 / 동영상
-			String uploadFileName = file.getOriginalFilename();
-			resource.setResourceName(uploadFileName);
-
-			String dir = bucket;
-			resource.setDir(dir);
-
-			String extention = FilenameUtils.getExtension(uploadFileName).toLowerCase();
-			if ("JPEG".equalsIgnoreCase(extention)) {
-				extention = "JPG";
-			}
-			StringBuffer sb = new StringBuffer();
-			sb.append(contentFolder);
-			sb.append("/").append(userId).append("/").append(resourceId).append(".").append(extention);
-			String fileName = sb.toString();
-
-			resource.setFilename(fileName);
-		} else if (ResourceType.isUTubeUrl(resource.getResourceType())) { // 이미지 / 동영상
-			resource.setResourceName(FileUtil.getYoutubeId(url)); // Utube id
-		} else if (ResourceType.isText(resource.getResourceType())) {
-			
-		}
-
-		resource.setUrl(url); // 저장용
-
-		return resource;
-	}
-
-
-
-	public List<Resources> createFile(List<MultipartFile> files, String userId, List<Resources> resources)
-			throws IOException {
-
-		int i = 0;
-		Resources resource = null;
-		for (MultipartFile file : files) {
-			resource = resources.get(i++);
-			resource = createFile(file, userId, resource);
-		}
-		return resources;
-	}
-
-	public Resources createFile(MultipartFile file, String userId, String recruitId, String title, String recruit,
-			String url) throws IOException {
-		Resources resource = getResources(file, userId, recruitId, title, recruit, url);
-
-		return createFile(file, userId, resource);
-	}
-
-	public Resources createFile(MultipartFile file, String userId, Resources resource) throws IOException {
-
-		if (resource.isStorage()) {
-			uploadSerivce.saveUserImg(file, resource.getFilename());
-		}
-
-//파일을 먼저 저장한 이후에 테이블에 저장한다. 		
-		String dateStr = CommonUtil.getSysTime();
-		resource.setBasicInfo(dateStr, userId);
-		save(resource);
-
-		return resource;
-	}
 
 	/**
 	 * 처리 전용 (조회에 사용하면 안됨)
@@ -740,7 +442,7 @@ public class RecruitService {
 
 		return list;
 	}
-	
+
 	private RecruitView getRecruitViewByContentNotAnother(Recruit recruit, Map<String, UserListView> userObjMap,
 			String searchUserid ) {  // 관리자페이지 컨텐츠리스트 띄우는데 다른거 가져오는것 때매 너무 오래걸려서 하나빼놨음
 
