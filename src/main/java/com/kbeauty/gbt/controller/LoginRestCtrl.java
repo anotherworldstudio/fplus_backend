@@ -60,7 +60,7 @@ public class LoginRestCtrl {
 		
 		User user = service.isUser(loginUser);
 //		User user = service.isUserOauth(loginUser);
-		TokenUtils.setJwtHeader(response, user);
+//		TokenUtils.setJwtHeader(response, user);
 		user.setOk();
 
 		return user;

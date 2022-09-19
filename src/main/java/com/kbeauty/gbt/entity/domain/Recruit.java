@@ -33,7 +33,6 @@ public class Recruit extends CommonDomain{
     @Column(name="startdate") private String startDate;
     @Column(name = "enddate")	private String endDate;
 
-
 //    이미지 링크 관련
     @Column(name="thumbnailimage") private String thumbnailImage;
     @Column(name="mainimage") private String mainImage;

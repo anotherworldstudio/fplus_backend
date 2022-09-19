@@ -35,16 +35,18 @@ public class WebConfig extends WebMvcConfigurationSupport {
     private JwtWebInterceptor jwtWebInterceptor;
 
 
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(jwtInterceptor).addPathPatterns("/v1/**").excludePathPatterns(EXCLUDE_PATHS);		
-		registry.addInterceptor(jwtWebInterceptor).addPathPatterns("/w1/**").excludePathPatterns(EXCLUDE_PATHS);		
+		registry.addInterceptor(jwtWebInterceptor).addPathPatterns("/w1/**").excludePathPatterns(EXCLUDE_PATHS);
     }
-    
+
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    	registry.addResourceHandler("/vendors/**").addResourceLocations("classpath:/static/vendors/");
-    	registry.addResourceHandler("/css/**").addResourceLocations("classpath:/static/css/");    	
+		registry.addResourceHandler("/vendors/**").addResourceLocations("classpath:/static/vendors/");
+    	registry.addResourceHandler("/css/**").addResourceLocations("classpath:/static/css/");
     	registry.addResourceHandler("/images/**").addResourceLocations("classpath:/static/images/");    	
     	registry.addResourceHandler("/js/**").addResourceLocations("classpath:/static/js/");
     	registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");

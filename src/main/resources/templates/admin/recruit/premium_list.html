@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lagn="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/default">
+
+<th:block layout:fragment="content">
+
+<!-- Javascript functions	-->
+<script type="text/javascript">
+
+	document.addEventListener("DOMContentLoaded", function(){
+	    $('#listBody').empty();
+	    $('#pagination').empty();
+
+
+		/*<![CDATA[*/
+		var premiumYn = "[[${condition?.premiumYn}]]";
+		var premiumStart = "[[${condition?.premiumStart}]]";
+		var premiumEnd = "[[${condition?.premiumEnd}]]";
+        var userName = "[[${condition?.userName}]]";
+
+
+        var page = "[[${condition?.page}]]";
+		var perPageNum = "[[${condition?.perPageNum}]]";
+
+
+		/*]]>*/
+
+		$('#premiumYn').val(premiumYn);
+		$('#premiumStart').val(premiumStart);
+		$('#premiumEnd').val(premiumEnd);
+        $('#userName').val(userName);
+
+
+
+        search(page, perPageNum);
+	});
+
+
+	function search(page, perPageNum){
+        var premiumYn = $('#premiumYn').val();
+        var premiumStart = $('#premiumStart').val();
+        var premiumEnd = $('#premiumEnd').val();
+        var userName = $('#userName').val();
+
+
+        var param = {};
+	    param.premiumYn = premiumYn;
+        param.premiumStart = premiumStart;
+        param.premiumEnd = premiumEnd;
+        param.userName = userName;
+
+
+        if(page !=null){
+	    	param.page = page;
+	    }
+
+	    if(perPageNum !=null){
+	    	param.perPageNum = perPageNum;
+	    }
+
+	    param = JSON.stringify(param);
+
+	    $('#listBody').empty();
+	    $('#pagination').empty();
+
+		$.ajax({
+	        url : "/w1/recruit/premium_list",
+	        data : param,
+	        type : 'post',
+	        contentType:"application/json; charset=UTF-8",
+	        dataType:"json",
+	        success : function(data){
+	            var results = data.list;
+                console.log(data);
+	            var rows = "";
+	            $.each(results, function(index, item) {
+
+                    // rows = rows + getRow(item.content, item.count);
+                    rows = rows + getRow(item.premium);
+                    console.log(item);
+
+				});
+
+	            $('#listBody').append(rows);
+
+	            var paging = getPageDiv(data.paging);
+	            $('#pagination').append(paging);
+
+                console.log(param);
+
+                //console.log(results);
+	            //console.log(data.paging);
+	        },
+	        error : function(e){
+	        	console.log(e);
+	        }
+        });
+
+	}
+
+    function getRow(premium){
+        var row = "\n";
+        row = row + "<tr class='even pointer'>                                     ";
+        row = row + "  <td class='a-center '>                                      ";
+        row = row + "    <input type='checkbox' class='flat' name='table_records'> ";
+        row = row + "  </td>                                                       ";
+        row = row + "  <td class=''>"+ premium.userName + "</td>                         ";
+        row = row + "  <td class=''>"+ premium.premiumYn + "</td>                                        ";
+        row = row + "  <td class=''>"+ premium.premiumStart + "</td>                                        ";
+        row = row + "  <td class=''>"+ premium.premiumEnd + "</td>                                        ";
+
+        row = row + "  </td>                                                       ";
+        row = row + "</tr>                                                         ";
+
+		return row;
+	}
+
+	function getPageDiv(paging){
+
+	  var pageDiv = "";
+	  if(paging == null) return;
+
+	  var previosPage = paging.startPage - 1;
+	  var perPage = paging.displayPageNum;
+	  var nextPage = paging.endPage + 1;
+	  var startPage = paging.startPage;
+	  var endPage = paging.endPage;
+	  var currPage = paging.page;
+
+   	  pageDiv = pageDiv + "<div class='row'>                                                ";
+      pageDiv = pageDiv + "  <div class='btn-group' role='group'>                           ";
+
+      if(paging.prev){
+      	pageDiv = pageDiv + "    <button type='button' class='btn btn-secondary' onClick='search(" + previosPage + ", " + perPage + ")'>이전</button>  ";
+      }else{
+      	pageDiv = pageDiv + "    <button type='button' class='btn btn-secondary' disabled>이전</button>  ";
+      }
+
+      for( i = startPage ; i <= endPage ; i++ ){
+    	  if(currPage == i){
+    		 pageDiv = pageDiv + "<button type='button' class='btn btn-secondary' disabled>" + i + "</button>";
+    	  }else{
+    	  	pageDiv = pageDiv + "<button type='button' class='btn btn-secondary' onClick='search(" + i + ", " + perPage + ")'>" + i + "</button>   ";
+    	  }
+
+      }
+
+      if(paging.next){
+       	pageDiv = pageDiv + "    <button type='button' class='btn btn-secondary' onClick='search(" + nextPage + ", " + perPage + ")'>다음</button>  ";
+       }else{
+       	pageDiv = pageDiv + "    <button type='button' class='btn btn-secondary' disabled>다음</button>  ";
+       }
+
+
+      pageDiv = pageDiv + "  </div>                                                         ";
+      pageDiv = pageDiv + "</div>                                                           ";
+
+      return pageDiv;
+	}
+
+
+</script>
+
+ <div class="x_content">
+  <div class="row">
+				<label class="control-label col-md-1 col-sm-1 ">구매한 유저 이름</label> <input
+				type="text" name="userName" id="userName" style="height: 35px">
+			<div class="col-md-4 col-sm-4 "></div>
+		</div>
+  <div class="row">
+
+      <div class="col-md-1 col-sm-1 center">
+          <button type="button" class="btn btn-round btn-primary mt-1" onClick="search()">조회</button>
+      </div>
+
+  </div>
+  <p><h5></h5></p>
+  <span class="section" style="text-align: right;padding-right: 10px;"></span>
+
+  <div class="table-responsive">
+    <table class="table table-striped jambo_table bulk_action">
+      <thead>
+        <tr class="headings">
+          <th>
+            <input type="checkbox" id="check-all" class="flat">
+          </th>
+          <th class="column-title">구매자</th>
+          <th class="column-title">구매완료</th>
+            <th class="column-title">시작기간</th>
+          <th class="column-title">종료기간</th>
+          <th class="bulk-actions" colspan="11">
+            <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
+          </th>
+        </tr>
+      </thead>
+
+          <tbody id="listBody">
+
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-md-12 col-sm-12" id="pagination" style="display: flex;justify-content: center;">
+		   <div class="row">
+             <div class="btn-group" role="group">
+               <button type="button" class="btn btn-secondary">이전</button>
+
+               <button type="button" class="btn btn-secondary">1</button>
+               <button type="button" class="btn btn-secondary">2</button>
+               <button type="button" class="btn btn-secondary">3</button>
+
+               <button type="button" class="btn btn-secondary">다음</button>
+             </div>
+           </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</th:block>
+</html>

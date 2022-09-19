@@ -65,6 +65,8 @@ public class LessonResCtrl {
 			@ApiParam(value = "LessonId", required = false, example = "Lesson GUID") @PathVariable("lessonId") String lessonId) {
 
 		String userId = TokenUtils.getTokenUserId(request);
+//		로그인안하면 화면 밖으로 팅김
+
 		LessonView lessonView = service.getLessonView(lessonId, userId);
 		if (lessonView == null) {
 			lessonView = new LessonView();

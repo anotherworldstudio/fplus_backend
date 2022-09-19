@@ -303,6 +303,7 @@
             and B.status = #{status}
         </if>
 
+
     </select>
 
     <select id="getReplyList" parameterType="com.kbeauty.gbt.entity.view.ContentCondition"

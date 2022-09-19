@@ -28,6 +28,8 @@ dependencies {
 	implementation 'org.springframework.session:spring-session-core'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.3'
 	implementation 'com.nimbusds:nimbus-jose-jwt:3.10'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation files ('/libs/sunec/sunec.jar');
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

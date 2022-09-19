@@ -67,19 +67,7 @@ public class RecruitService {
 	 * @return
 	 */
 
-	
-	public List<RecruitView> getRecruitViewList(RecruitCondition condition) {
-		List<RecruitView> list = new ArrayList<>();
-		List<Recruit> recruitList = recruitMapper.getRecruitList(condition);
 
-		Map<String, UserListView> userObjMap = getUserObjMap(recruitList);
-
-		for (Recruit recruit : recruitList) {
-			list.add(getRecruitViewByContent(recruit, userObjMap, condition.getSearchUserid()));
-		}
-		return list;
-	}
-	
 	public List<RecruitView> getRecruitViewListNotAnother(RecruitCondition condition) {
 		List<RecruitView> list = new ArrayList<>();
 		List<Recruit> recruitList = recruitMapper.getRecruitList(condition);
@@ -93,9 +81,29 @@ public class RecruitService {
 	}
 
 
+
+
 	public int getRecruitListCnt(RecruitCondition condition) {
 
 		return recruitMapper.getRecruitListCnt(condition);
+	}
+
+//	TODO: 새로 조회
+	public int getPremiumByListCnt(RecruitByCondition condition) {
+		return recruitMapper.getPremiumByListCnt(condition);
+	}
+
+	public List<RecruitByView> getPremiumList(RecruitByCondition condition) {
+		List<RecruitByView> list = new ArrayList<>();
+//		RecruitByView view = new RecruitByView();
+		List<Premium> premiumList = recruitMapper.getPremiumByList(condition);
+		for (Premium pm: premiumList ) {
+			RecruitByView view = new RecruitByView();
+			view.setPremium(pm);
+			list.add(view);
+		}
+
+		return list;
 	}
 
 
@@ -106,15 +114,6 @@ public class RecruitService {
 	public Recruit getRecruit(String recruitId) {
 		Recruit recruit = recruitRepo.findByRecruitId(recruitId);
 		return recruit;
-	}
-
-	private void setRecruitUserInfo(Recruit recruit) {
-		User user = userService.getUser(recruit.getUserId());
-		if (user != null) {
-			recruit.setUserName(user.getUserName());
-			String userImgUrl = userService.getUrl(user);
-			recruit.setUserImgUrl(userImgUrl);
-		}
 	}
 
 
@@ -235,11 +234,13 @@ public class RecruitService {
 
 	/**
 	 * 화면에서 조회할 때 사용하는 함수
-	 * 
-	 * @param recruitId
-	 * @param userId
+	 *
+	 * @param
+	 * @param
 	 * @return
 	 */
+
+
 	public RecruitView getRecruitView(String recruitId, String userId) {
 		// TODO userId 를 사용해서 조회 가능한지 권한 체크해야 함. ==> 공통 사항.
 		Recruit recruit = recruitRepo.findByRecruitId(recruitId);
@@ -296,6 +297,7 @@ public class RecruitService {
 		RecruitView view = getRecruitViewByContent(recruit, null, null, true);
 		return view;
 	}
+
 
 	private Map<String, UserListView> getUserObjMap(List<Recruit> recruitList) {
 		List<String> userids = new ArrayList<String>();

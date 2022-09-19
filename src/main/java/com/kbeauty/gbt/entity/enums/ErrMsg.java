@@ -72,6 +72,8 @@ public enum ErrMsg{
 	,TRAINING_DUPLICATE_DATA("8080", "이미 저장된 실습이 있습니다")
 	,LESSON_DELETE_ERR("8100", "실습 삭제실패 했습니다")
 	,TRAINING_DELETE_ERR("8110", "실습정보 삭제에 실패했습니다")
+
+	,NO_PREMIUM_USER("8000","구매내역이 없습니다.")
 	
 	;
 	

@@ -53,6 +53,18 @@
 
         }
 
+        function buyPremium(){
+            showConfirm("구매 하시겠습니까?", function(){
+                var data = new FormData();
+
+                data.append("premiumYn", $("#primiumYn").val())
+                data.append("premiumStart", $("#premiumStart").val());
+                data.append("premiumEnd", $("#premiumEnd").val());
+
+                savePremiumCommon(data);
+            });
+        }
+
         function deleteRecruit() {
             showModal("삭제 하시겠습니까?", true, function () {
                 form1.action = "/w1/recruit/delete_recruit";
@@ -177,6 +189,10 @@
                 <div class="form-group">
                     <div class="col-md-12 col-sm-12 " style="text-align: right;">
                         <button type='button' class="btn btn-primary" id="saveRecruitBtn" style="position: center;" onClick="editRecruit()">저장하기
+                        </button>
+                    </div>
+                    <div class="col-md-12 col-sm-12 " style="text-align: right;">
+                        <button type='button' class="btn btn-primary" id="saveRecruitBtn" style="position: center;" onClick="buyPremium()">프리미엄 구매하기
                         </button>
                     </div>
                 </div>

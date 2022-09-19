@@ -174,7 +174,9 @@ public class UserService extends CommonService {
 		String orgFileName = faceImg.getOriginalFilename();
 		String imgId = CommonUtil.getGuid();
 		String neoFileName = FileUtil.getNeoFileName(imgId, orgFileName); // 확장자는 여기서 붙
-		String fileName = FileUtil.getStoragePath(userFolder, user.getUserId(), neoFileName, StoragePath.CONTENT_USER);
+		String fileName = FileUtil.getStoragePath(
+
+				userFolder, user.getUserId(), neoFileName, StoragePath.CONTENT_USER);
 		String dir = bucket;
 		user.setImageDir(dir);
 		user.setImageName(fileName);

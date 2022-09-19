@@ -17,6 +17,17 @@
         <result property="userId" column="userid" />
     </resultMap>
 
+    <resultMap id="PremiumResultMap" type="com.kbeauty.gbt.entity.domain.Premium">
+        <result property="userId" column="userid"/>
+        <result property="userName" column="username"/>
+        <result property="premiumYn" column="premiumyn"/>
+        <result property="premiumStart" column="premiumstart"/>
+        <result property="premiumEnd" column="premiumend"/>
+        <result property="userId" column="userid" />
+        <result property="premiumYn" column="premiumyn" />
+        <result property="premiumStart" column="premiumstart" />
+        <result property="premiumEnd" column="premiumend" />
+    </resultMap>
 
     <select id="getRecruitList" parameterType="com.kbeauty.gbt.entity.view.RecruitCondition"
             resultMap="recruitListResultMap">
@@ -38,6 +49,10 @@
             and recruittype = #{recruitType}
         </if>
 
+        <if test='title != null &amp;&amp; !"".equals(title)'>
+            and title = #{title}
+        </if>
+
         <if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>
             and userid = (SELECT userid FROM USER WHERE username = #{searchUserName})
         </if>
@@ -48,6 +63,37 @@
 
         limit #{pageStart}, #{perPageNum}
     </select>
+
+
+    <select id="getPremiumByList" parameterType="com.kbeauty.gbt.entity.view.RecruitByCondition"
+            resultMap="PremiumResultMap">
+        SELECT A.recruitid,A.userid,B.premiumyn,B.premiumstart,B.premiumend,C.username
+        FROM RECRUIT A, PREMIUM B ,USER C
+        WHERE A.userid = B.userid
+
+        <if test='userName != null &amp;&amp; !"".equals(userName)'>
+            and C.username like CONCAT(#{userName},'%')
+        </if>
+
+        AND B.userid = C.userid
+        AND B.premiumyn = 'Y'
+        ORDER BY(
+        CASE WHEN DATE(B.premiumstart) &lt; DATE(NOW()) AND DATE(B.premiumend) >= DATE(NOW()) THEN 1
+        ELSE 2
+        END)
+</select>
+
+    <select id="getPremiumByListCnt" parameterType="com.kbeauty.gbt.entity.view.RecruitByCondition"
+            resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM PREMIUM A, USER B
+        WHERE A.userid = B.userid
+
+        <if test='userName != null &amp;&amp; !"".equals(userName)'>
+            and B.username like CONCAT(#{userName},'%')
+        </if>
+</select>
+
 
     <select id="getRecruitListCnt" parameterType="com.kbeauty.gbt.entity.view.RecruitCondition"
             resultType="java.lang.Integer">
@@ -65,6 +111,10 @@
 
         <if test='recruitType != null &amp;&amp; !"".equals(recruitType)'>
             and recruittype = #{recruitType}
+        </if>
+
+        <if test='title != null &amp;&amp; !"".equals(title)'>
+            and title = #{title}
         </if>
 
         <if test='searchUserName != null &amp;&amp; !"".equals(searchUserName)'>

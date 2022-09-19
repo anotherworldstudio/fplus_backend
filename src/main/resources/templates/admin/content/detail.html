@@ -222,28 +222,6 @@ function saveReply(){
 		data.append("upperContentId", $("#contentId").val());
 		
 		saveReplyCommon(data);
-
-// 		$.ajax({
-//             type: "POST",
-//             enctype: 'multipart/form-data',
-//             url: "/w1/content/save_reply",
-//             data: data,
-//             processData: false,
-//             contentType: false,
-//             cache: false,
-//             timeout: 180000,
-//             success: function (result) {
-//                 console.log("SUCCESS : ", result.code);
-//                 if(result.code == "0000"){
-//                 	$("#replyContent").val("");
-//                 	search();                	
-//                 }               
-//             },
-//             error: function (e) {
-//                 console.log("ERROR : ", e);
-//                 alert("처리 중 오류가 발생하였습니다.");
-//             }
-//         });
 	});
 }
 

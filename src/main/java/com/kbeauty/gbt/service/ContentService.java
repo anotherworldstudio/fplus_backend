@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+import com.kbeauty.gbt.entity.view.*;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,12 +61,6 @@ import com.kbeauty.gbt.entity.enums.ResourceCategory;
 import com.kbeauty.gbt.entity.enums.ResourceType;
 import com.kbeauty.gbt.entity.enums.StoragePath;
 import com.kbeauty.gbt.entity.enums.YesNo;
-import com.kbeauty.gbt.entity.view.AiRecommandProduct;
-import com.kbeauty.gbt.entity.view.ContentCondition;
-import com.kbeauty.gbt.entity.view.ContentView;
-import com.kbeauty.gbt.entity.view.ImageData;
-import com.kbeauty.gbt.entity.view.SkinResultView;
-import com.kbeauty.gbt.entity.view.UserListView;
 import com.kbeauty.gbt.util.CommonUtil;
 import com.kbeauty.gbt.util.FileUtil;
 import com.kbeauty.gbt.util.ImageUtil;
@@ -209,7 +204,8 @@ public class ContentService {
 		}
 		return list;
 	}
-	
+
+
 	public List<ContentView> getContentViewListNotAnother(ContentCondition condition) {
 		List<ContentView> list = new ArrayList<>();
 		List<Content> contentList = contentMapper.getContentList(condition);

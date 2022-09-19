@@ -12,6 +12,7 @@ import com.kbeauty.gbt.entity.view.AiRecommandProduct;
 @Repository
 public interface ContentRepo  extends CrudRepository<Content, Long>{
 	Content findByContentId(String contentId);
+	Content findByTitle(String title);
 	Content findByPath(String path);
 	Content findBySeq(int seq);
 	List<Content> findByContentType(String contenttype);

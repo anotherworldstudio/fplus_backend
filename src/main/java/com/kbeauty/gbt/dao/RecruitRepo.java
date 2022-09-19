@@ -10,6 +10,8 @@ import java.util.List;
 @Repository
 public interface RecruitRepo extends CrudRepository<Recruit, Long>{
 	Recruit findByRecruitId(String recruitId);
+	Recruit findByUserId(String userId);
+
 //	공고 아이디로 찾기
 	Recruit findByPath(String path);
 //	Path로 찾기

@@ -1,5 +1,6 @@
 package com.kbeauty.gbt.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -8,6 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -40,7 +43,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     	
         // disables cors and csrf
 //     // authenticate
-        http.authorizeRequests()                                
+        http.authorizeRequests()
+                .antMatchers("/**").permitAll()
+                .antMatchers("/login").permitAll()
                 .antMatchers("/v1/**").permitAll()
                 .antMatchers("/w1/**").permitAll()                
 //                .antMatchers("/vendors/**").permitAll()                
@@ -56,7 +61,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic().disable()
         .cors().and()
         .csrf()
-        .disable();
+        .disable()
+                .formLogin()
+                .loginProcessingUrl("/login");
+
         
         
 //                .and()
@@ -73,6 +81,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
 //        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
-    }        
+    }
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
  
 }
