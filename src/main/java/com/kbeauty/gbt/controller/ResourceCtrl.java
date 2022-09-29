@@ -131,7 +131,8 @@ public class ResourceCtrl {
 	public Resources save(@RequestParam(value = "fileName", required = false) MultipartFile file, Resources resource) throws IOException {
 
 		//String s3url = s3Uploader.upload(file,"test");
-
+//		S3Uploader up = new S3Uploader();
+//		up.upload(nnn,"user")
 		if (resource == null) {
 			resource = new Resources();
 			resource.setError(ErrMsg.CONTENT_NO_SAVE_ERR);

@@ -61,9 +61,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic().disable()
         .cors().and()
         .csrf()
-        .disable()
-                .formLogin()
-                .loginProcessingUrl("/login");
+        .disable();
+//                .formLogin()
+//                .loginProcessingUrl("/login");
 
         
         

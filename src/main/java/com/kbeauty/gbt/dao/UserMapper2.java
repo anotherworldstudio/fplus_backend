@@ -1,14 +1,9 @@
 package com.kbeauty.gbt.dao;
 
-import com.kbeauty.gbt.entity.domain.Follow;
-import com.kbeauty.gbt.entity.domain.User;
-import com.kbeauty.gbt.entity.domain.UserFace;
+import com.kbeauty.gbt.entity.domain.User2;
 import com.kbeauty.gbt.entity.view.*;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public interface UserMapper2 {
 
@@ -16,6 +11,8 @@ public interface UserMapper2 {
 	public int getUserListCnt(UserCondition2 condition);
 
 	public int emailCheck(String email);
+
+	public User2 loginFplus(User2 user2) ;
 
 
 }

@@ -38,6 +38,7 @@ public class S3Uploader {
 //    }
 
     // S3로 파일 업로드하기
+    // upload(사진,user)
     public String upload(MultipartFile multipartFile, String dirName) {
         String ext = "";
         if(multipartFile == null){

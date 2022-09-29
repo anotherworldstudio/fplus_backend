@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import com.kbeauty.gbt.entity.domain.*;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,12 +29,6 @@ import com.kbeauty.gbt.dao.UserMapper;
 import com.kbeauty.gbt.dao.UserRepo;
 import com.kbeauty.gbt.dao.UserSkinRepo;
 import com.kbeauty.gbt.entity.CommonConstants;
-import com.kbeauty.gbt.entity.domain.AppleLogin;
-import com.kbeauty.gbt.entity.domain.Content;
-import com.kbeauty.gbt.entity.domain.Follow;
-import com.kbeauty.gbt.entity.domain.User;
-import com.kbeauty.gbt.entity.domain.UserFace;
-import com.kbeauty.gbt.entity.domain.UserSkin;
 import com.kbeauty.gbt.entity.enums.ErrMsg;
 import com.kbeauty.gbt.entity.enums.FollowActionType;
 import com.kbeauty.gbt.entity.enums.FollowSearchType;

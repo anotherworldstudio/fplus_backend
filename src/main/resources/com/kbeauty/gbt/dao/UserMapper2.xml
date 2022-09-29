@@ -31,4 +31,11 @@
 		SELECT COUNT(*) FROM USER2
 			WHERE email = #{email}
 		</select>
+
+	<select id="loginFplus" parameterType="com.kbeauty.gbt.entity.domain.User2" resultType="com.kbeauty.gbt.entity.domain.User2">
+		SELECT *
+		FROM USER2
+		WHERE email = #{email}
+		AND password = #{password}
+	</select>
 </mapper>

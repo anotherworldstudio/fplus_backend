@@ -1,6 +1,7 @@
 package com.kbeauty.gbt.entity.domain;
 
 import com.kbeauty.gbt.entity.enums.UserRole;
+import com.kbeauty.gbt.entity.enums.UserRole2;
 import com.kbeauty.gbt.entity.view.ImageData;
 import com.kbeauty.gbt.util.StringUtil;
 import lombok.Data;
@@ -28,6 +29,18 @@ public class User2 extends CommonDomain {
     private String friendId;
     @Column(name = "password")
     private String password;
+    @Column(name = "sex")
+    private String sex;
+    @Column(name = "birth")
+    private String birth;
+    @Column(name = "place")
+    private String place;
+    @Column(name = "imagedir")
+    private String imageDir;
+    @Column(name = "imagename")
+    private String imageName;
+
+    @Transient	private String imgUrl;
 
 
     public boolean isSame(User2 user) {
@@ -39,6 +52,11 @@ public class User2 extends CommonDomain {
             return false;
         }
     }
+
+    public boolean isAdmin() {
+        return UserRole2.ADMIN.getCode().equals(userRole);
+    }
+
 }
 
 
