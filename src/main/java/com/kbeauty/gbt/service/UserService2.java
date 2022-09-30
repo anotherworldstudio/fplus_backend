@@ -211,8 +211,10 @@ public class UserService2 extends CommonService {
         return sb.toString();
     }
 
-//    수정메소드 컨트롤러 말고 백단에서 할 것
+//    수정메소드 컨트롤러 말고 서비스단에서 할 것
     public User2 update(User2 oldUserInfo, User2 userInfo) {
+
+
         oldUserInfo.setBirth(userInfo.getBirth());
         oldUserInfo.setSocial(userInfo.getSocial());
         oldUserInfo.setAwards(userInfo.getAwards());
@@ -221,6 +223,17 @@ public class UserService2 extends CommonService {
         oldUserInfo.setIntro(userInfo.getIntro());
         oldUserInfo.setJob(userInfo.getJob());
         oldUserInfo.setPlace(userInfo.getPlace());
+        oldUserInfo.setMyStatus(userInfo.getMyStatus());
+        oldUserInfo.setVideo(userInfo.getVideo());
+
+        if(userInfo.getAwards() == null || userInfo.getAwards().equals("")) {
+            oldUserInfo.setAwards(null);
+        }
+
+        if(userInfo.getSocial() == null || userInfo.getSocial().equals("")) {
+            oldUserInfo.setSocial(null);
+        }
+
         userRepo2.save(oldUserInfo);
         return oldUserInfo;
     }

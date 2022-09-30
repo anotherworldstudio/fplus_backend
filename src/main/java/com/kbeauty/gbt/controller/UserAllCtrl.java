@@ -95,65 +95,23 @@ public class UserAllCtrl {
         return user;
     }
 
+
+//    TODO : profile UPDATE
+
     @RequestMapping(value="/update/user", method=RequestMethod.POST)
-    public String updateUser(HttpServletRequest request,@RequestBody User2 userInfo, RedirectAttributes redirectAttributes){
+    public User2 updateUser(HttpServletRequest request,@RequestBody User2 userInfo, RedirectAttributes redirectAttributes){
         HttpSession session = request.getSession();
         User2 OldUserInfo = (User2) session.getAttribute("user");
         User2 user = new User2();
 
         if(OldUserInfo == null) {
-            return "없는 유저입니다.";
+            return null;
         }
         user = userService.update(OldUserInfo,userInfo);
 
-        System.out.println(OldUserInfo + "userId!@!@#!!2");
-        System.out.println(userInfo + "info@@@@@@@@@@@@@@@@@@@!@#!!2");
-
         user.setOk();
 
-        return "return" + user;
+        return user;
     }
 
-//    @RequestMapping(value="/update/user", method=RequestMethod.POST)
-//    public String save(HttpServletRequest request, UserView2 view, RedirectAttributes redirectAttributes){
-//        User2 user = view.getUser();
-//
-//        if(user == null) {
-//            user.setError(ErrMsg.CONTENT_NO_SAVE_ERR);
-//            redirectAttributes.addFlashAttribute(ConstantMapKey.ERROR_MSG_KEY.toString(), ErrMsg.CONTENT_NO_SAVE_ERR);
-//            return "/error/validate";
-//        }
-//
-//        String loginUserId = login.getUserId();
-//
-//        if( ! StringUtil.isEmpty(user.getUserId())) {
-//            // 기존 사용자 조회 이후에 해당 항목만 수정함
-//            // 이멜/사용자명/생년월일/성별/휴대폰/국적//사용자구분//로그인구분/마켓팅/상태/비고
-//            User2 oldUser = userService.getUser(user.getUserId());
-//            oldUser.setEmail(user.getEmail());
-//            oldUser.setBirth(user.getBirth());
-//            oldUser.setPlace(user.getPlace());
-//            oldUser.setSex(user.getSex());
-//            oldUser.setTeam(user.getTeam());
-//            oldUser.setIntro(user.getIntro());
-//            oldUser.setUserRole(user.getUserRole());
-//            oldUser.setJob(user.getJob());
-//            oldUser.setCareer(user.getCareer());
-//            oldUser.setAwards(user.getAwards());
-//            oldUser.setSocial(user.getSocial());
-////            oldUser.setHeight(user.getHeight());
-////            oldUser.setBust(user.getBust());
-////            oldUser.setShose(user.getShose());
-////            oldUser.setWaist(user.getWaist());
-////            oldUser.setHair(user.getHair());
-////            oldUser.setHip(user.getHip());
-//            user = userService.save(oldUser);
-//        }else {
-//            user = userService.save(user);
-//        }
-//
-//        user.setOk();
-//
-//        return "user";
-//    }
 }

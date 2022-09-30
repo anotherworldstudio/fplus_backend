@@ -55,6 +55,8 @@ public class User2 extends CommonDomain {
     private String awards;
     @Column(name = "social")
     private String social;
+    @Column(name = "video")
+    private String video;
 //    @Column(name = "height")
 //    private String height;
 //    @Column(name = "bust")
