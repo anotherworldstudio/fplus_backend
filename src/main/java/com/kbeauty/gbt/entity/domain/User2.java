@@ -21,6 +21,8 @@ public class User2 extends CommonDomain {
 
     @Column(name = "userid")
     private String userId;
+    @Column(name = "name")
+    private String name;
     @Column(name = "email")
     private String email;
     @Column(name = "userrole")
@@ -39,6 +41,32 @@ public class User2 extends CommonDomain {
     private String imageDir;
     @Column(name = "imagename")
     private String imageName;
+    @Column(name = "team")
+    private String team;
+    @Column(name = "intro")
+    private String intro;
+    @Column(name = "mystatus")
+    private String myStatus;
+    @Column(name = "job")
+    private String job;
+    @Column(name = "career")
+    private String career;
+    @Column(name = "awards")
+    private String awards;
+    @Column(name = "social")
+    private String social;
+//    @Column(name = "height")
+//    private String height;
+//    @Column(name = "bust")
+//    private String bust;
+//    @Column(name="shose")
+//    private String shose;
+//    @Column(name="waist")
+//    private String waist;
+//    @Column(name="hair")
+//    private String hair;
+//    @Column(name="hip")
+//    private String hip;
 
     @Transient	private String imgUrl;
 

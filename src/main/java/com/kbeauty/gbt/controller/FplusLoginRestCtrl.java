@@ -1,36 +1,22 @@
 package com.kbeauty.gbt.controller;
 
-import com.github.scribejava.core.oauth.OAuth20Service;
-import com.kbeauty.gbt.entity.domain.AppleLogin;
 import com.kbeauty.gbt.entity.domain.Login;
-import com.kbeauty.gbt.entity.domain.User;
 import com.kbeauty.gbt.entity.domain.User2;
-import com.kbeauty.gbt.entity.enums.ErrMsg;
-import com.kbeauty.gbt.entity.view.CommonView;
-import com.kbeauty.gbt.entity.view.FplusUserView;
 import com.kbeauty.gbt.service.LoginService;
-import com.kbeauty.gbt.service.UserService;
 import com.kbeauty.gbt.service.UserService2;
-import com.kbeauty.gbt.util.TokenUtils;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 @RestController
 //@Api(value = "Fplus Login REST Controller")
@@ -72,13 +58,13 @@ public class FplusLoginRestCtrl {
 
 //    TODO: LOGIN
 @RequestMapping(value = "/login/fplus", method = RequestMethod.POST)
-public String login(@RequestBody User2 vo, HttpServletRequest req, HttpServletResponse response,RedirectAttributes rttr) throws Exception{
+public User2 login(@RequestBody User2 vo, HttpServletRequest req, HttpServletResponse response, RedirectAttributes rttr) throws Exception{
 
     HttpSession session = req.getSession();
 //    System.out.println("email만 체크:"+req.getParameter("email"));
 //    System.out.println("User2 vo : " + vo.toString());
     User2 login = service.login(vo);
-    System.out.println("login : " + login.toString()) ;
+
     if(login == null) {
         session.setAttribute("user", null);
         rttr.addFlashAttribute("msg", false);
@@ -86,7 +72,7 @@ public String login(@RequestBody User2 vo, HttpServletRequest req, HttpServletRe
         session.setAttribute("user", login);
     }
     System.out.println(login);
-    return "redirect:/";
+    return login;
 }
 
     @RequestMapping(value = "/logout/fplus", method = RequestMethod.GET)
@@ -94,7 +80,6 @@ public String login(@RequestBody User2 vo, HttpServletRequest req, HttpServletRe
         System.out.println("!!!!!!!!!!!!!!!!SESSION!!!!" + session.getAttribute("user"));
 
         session.invalidate();
-
 
         return "redirect:/";
     }

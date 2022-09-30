@@ -13,6 +13,7 @@ public interface UserMapper2 {
 	public int emailCheck(String email);
 
 	public User2 loginFplus(User2 user2) ;
-
+	public List<UserListView2> FplusUserList(UserCondition2 condition);
+	public int FplusUserListCnt(UserCondition2 condition);
 
 }

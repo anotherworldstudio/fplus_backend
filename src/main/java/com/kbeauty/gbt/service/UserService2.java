@@ -2,13 +2,15 @@ package com.kbeauty.gbt.service;
 
 import com.kbeauty.gbt.dao.UserMapper2;
 import com.kbeauty.gbt.dao.UserRepo2;
+import com.kbeauty.gbt.entity.domain.Recruit;
+import com.kbeauty.gbt.entity.domain.User;
 import com.kbeauty.gbt.entity.domain.User2;
-import com.kbeauty.gbt.entity.enums.StoragePath;
-import com.kbeauty.gbt.entity.enums.UserRole2;
-import com.kbeauty.gbt.entity.view.FplusUserView;
+import com.kbeauty.gbt.entity.enums.*;
+import com.kbeauty.gbt.entity.view.*;
 import com.kbeauty.gbt.util.CommonUtil;
 import com.kbeauty.gbt.util.FileUtil;
 import com.kbeauty.gbt.util.StringUtil;
+import org.apache.commons.io.serialization.ClassNameMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService2 extends CommonService {
@@ -46,6 +51,11 @@ public class UserService2 extends CommonService {
 
     @Value("${spring.cloud.gcp.storage.bucket.training}")
     private String trainingFolder;
+
+    public int getUserListCnt(UserCondition2 condition) {
+        int result = userMapper2.getUserListCnt(condition);
+        return result;
+    }
 
     public User2 save(User2 user2) {
         boolean isNew = false;
@@ -79,7 +89,7 @@ public class UserService2 extends CommonService {
         }
 
         String friendId = user2.getFriendId();
-        if(friendId.isEmpty() || friendId == null) {
+        if(friendId.isEmpty() || friendId.equals(" ")) {
             user2.setFriendId(null);
         }
         else {
@@ -157,6 +167,66 @@ public class UserService2 extends CommonService {
     }
 
     public User2 login(User2 user2) {
-        return userMapper2.loginFplus(user2);
+        String password = user2.getPassword();
+        User2 user = userMapper2.loginFplus(user2);
+        ClassNameMatcher passEncoder;
+        if(passwordEncoder.matches(password, user.getPassword())){
+            return user;
+        }else{
+            return null;
+        }
     }
+
+    public List<UserListView2> getUserList(UserCondition2 condition) {
+        List<UserListView2> list = userMapper2.getUserList(condition);
+        setUserData(list);
+        return list;
+    }
+
+    private void setUserData(List<UserListView2> list) {
+        for (UserListView2 userListView : list) {
+
+//            userListView.setImgUrl(getUrl(userListView));
+
+        }
+    }
+
+    private String getUrl(UserListView2 userListView) {
+        String imageDir = userListView.getImageDir();
+        String imageName = userListView.getImageName();
+
+        return getUrl(imageDir, imageName);
+    }
+
+    private String getUrl(String imageDir, String imageName) {
+        if (!StringUtil.isEmpty(imageDir) && imageDir.startsWith("http")) {
+            return imageDir;
+        }
+
+        if (StringUtil.isEmpty(imageName)) {
+            return "/images/no_user_img.png";
+        }
+        StringBuffer sb = new StringBuffer();
+        sb.append(storageUrl).append("/").append(imageDir).append("/").append(imageName);
+        return sb.toString();
+    }
+
+//    수정메소드 컨트롤러 말고 백단에서 할 것
+    public User2 update(User2 oldUserInfo, User2 userInfo) {
+        oldUserInfo.setBirth(userInfo.getBirth());
+        oldUserInfo.setSocial(userInfo.getSocial());
+        oldUserInfo.setAwards(userInfo.getAwards());
+        oldUserInfo.setUserRole(userInfo.getUserRole());
+        oldUserInfo.setCareer(userInfo.getCareer());
+        oldUserInfo.setIntro(userInfo.getIntro());
+        oldUserInfo.setJob(userInfo.getJob());
+        oldUserInfo.setPlace(userInfo.getPlace());
+        userRepo2.save(oldUserInfo);
+        return oldUserInfo;
+    }
+
+
+//    public User2 login(User2 user2) {
+//        return userMapper2.loginFplus(user2);
+//    }
 }

@@ -5,25 +5,28 @@
     
 <mapper namespace="com.kbeauty.gbt.dao.UserMapper2">
 
-	<resultMap id="userListViewResultMap" type="com.kbeauty.gbt.entity.view.UserListView2">
-	  <result property="seq" column="seq"/>  
-	  <result property="userId" column="userid"/>
+	<resultMap id="UserViewResultMap" type="com.kbeauty.gbt.entity.view.UserListView2">
+	  <result property="seq" column="seq"/>
+		<result property="userId" column="userid"/>
+		<result property="name" column="name"/>
 		<result property="email" column="email"/>
 		<result property="password" column="password"/>
+		<result property="place" column="place" />
+		<result property="sex" column="sex" />
+		<result property="birth" column="birth" />
+		<result property="userRole" column="userrole" />
+		<result property="imageName" column="imagename" />
+		<result property="imageDir" column="imagedir" />
+		<result property="loginTime" column="logintime" />
+		<result property="regDate" column="regdate" />
+		<result property="regUser" column="reguser" />
+		<result property="chgDate" column="chgdate" />
+		<result property="chgUser" column="chguser" />
+		<result property="friendId" column="friendid" />
+		<result property="delYn" column="delyn" />
+		<result property="oauthType" column="oauthtype" />
+		<result property="status" column="status" />
 	</resultMap>
-	
-
-    <select id="getUserList" parameterType="com.kbeauty.gbt.entity.view.UserCondition2"
-                                resultMap="userListViewResultMap">
-        select * from USER2 where 1 = 1
-
-  		<if test='email != null &amp;&amp; !"".equals(email)'>
-			and email like CONCAT(#{email},'%')
-  		</if>
-  		
-        ORDER BY seq desc 
-		limit #{pageStart}, #{perPageNum}
-    </select>
 
 
 
@@ -36,6 +39,49 @@
 		SELECT *
 		FROM USER2
 		WHERE email = #{email}
-		AND password = #{password}
+	</select>
+
+	<select id="FplusUserList" parameterType="com.kbeauty.gbt.entity.view.UserCondition2"
+			resultMap="UserViewResultMap">
+		select * from USER2 where 1 = 1
+
+		<if test='userId != null &amp;&amp; !"".equals(userId)'>
+			and userid = #{userId}
+		</if>
+		<if test='name != null &amp;&amp; !"".equals(name)'>
+			and username LIKE CONCAT(#{name},'%')
+		</if>
+		<if test='email != null &amp;&amp; !"".equals(email)'>
+			and email = #{email}
+		</if>
+		<if test='status != null &amp;&amp; !"".equals(status)'>
+			and status = #{status}
+		</if>
+		<if test='userRole != null &amp;&amp; !"".equals(userRole)'>
+			and userrole = #{userRole}
+		</if>
+
+		ORDER BY seq desc
+		limit #{pageStart}, #{perPageNum}
+	</select>
+
+	<select id="FplusUserListCnt" parameterType="com.kbeauty.gbt.entity.view.UserCondition2"
+			resultType="java.lang.Integer">
+		select count(*) as cnt from USER2 where 1 = 1
+		<if test='userId != null &amp;&amp; !"".equals(userId)'>
+			and userid = #{userId}
+		</if>
+		<if test='name != null &amp;&amp; !"".equals(name)'>
+			and username LIKE CONCAT(#{name},'%')
+		</if>
+		<if test='email != null &amp;&amp; !"".equals(email)'>
+			and email = #{email}
+		</if>
+		<if test='status != null &amp;&amp; !"".equals(status)'>
+			and status = #{status}
+		</if>
+		<if test='userRole != null &amp;&amp; !"".equals(userRole)'>
+			and userrole = #{userRole}
+		</if>
 	</select>
 </mapper>
